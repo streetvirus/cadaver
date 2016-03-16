@@ -6,4 +6,4 @@
     - `.section-margins`
     - `.grid-margins`
 - Add Bootstrap JS
-- Create JS structure
+- Create JS structure 
