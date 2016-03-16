@@ -1,0 +1,77 @@
+/* Separating articles with a border on the blog landing page.*/
+.template-blog .article {
+  border-bottom: darken( $body-bg, 5%) 0.07rem solid;
+  padding: ($grid-gutter-width / 2) 0;
+  &.first {
+    padding-top: 0;
+  }
+  &.last {
+    border-bottom: none;
+  }
+}
+
+/* All blog images should stretch to the full width on small screens. */
+@media (max-width: $screen-xs) {
+  .template-article .article img {
+    display: block;
+    width: 100% !important;
+    float: none !important;
+    margin-top: $grid-gutter-width/4 !important;
+    margin-bottom: $grid-gutter-width/4 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    @include clearfix;
+  }
+}
+
+.date, .comment-date { @extend .zeta; }
+
+.meta > span + span { padding-left: $grid-gutter-width/4; }
+
+/* Square element that contains the blog image, which is
+set as a centered background image. */
+.square-holder {
+  display: block; 
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover; 
+  width: 100%; 
+  height: 0; 
+  padding-bottom: 100%;
+}
+
+/* Fading out content so that the height of the article excerpt
+always matches the height of the blog image on the left. */
+.fadeout-overflow-bottom {
+  position: relative;
+  height: 0; 
+  padding-bottom: 33.33%; 
+  overflow: hidden;
+}
+.fadeout-overflow-bottom:after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;  
+  width: 100%;
+  height: 1.5 * $grid-gutter-width;
+  background: linear-gradient(to top, rgba($body-bg, 1) 0, rgba($body-bg, 0) 100%);
+  pointer-events: none;
+}
+
+/* On small screens, we don't truncate content, and don't fade
+it out since the blog image is full-width, and the excerpt
+is below it. */
+@media (max-width: $screen-xs) {
+  .fadeout-overflow-bottom {
+    height: auto;
+    padding-bottom: 0;
+  }
+  .fadeout-overflow-bottom:after {
+    background: transparent;
+  }
+}
+
+.lt-ie9 .fadeout-overflow-bottom { height: auto; padding-bottom: 0; }
+
+#comments { margin: $grid-gutter-width 0; }

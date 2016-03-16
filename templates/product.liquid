@@ -1,0 +1,210 @@
+{% assign add_to_cart = 'Add to cart' %}
+{% assign sold_out = 'Sold Out' %}
+{% assign unavailable = 'Unavailable' %}
+
+<div class="product" itemscope itemtype="http://schema.org/Product">
+  <div class="row">
+
+    <div class="col-md-6">
+      <div class="product-photos">
+    
+      {% if product.images.size == 0 %}
+    
+        <div class="product-photo-container">
+          <img src="{{ '' | img_url: 'grande' }}" alt="" />
+        </div>
+      
+      {% else %}
+      
+        {% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+        <div class="product-photo-container">
+          <a href="{{ featured_image | img_url: '1024x1024' }}">
+            <img src="{{ featured_image | img_url: 'grande' }}" alt="{{ product.title | escape }}" />
+          </a>
+        </div>
+
+        {% if product.images.size > 1 %}
+        <ul class="product-photo-thumbs clearfix grid">
+          {% for image in product.images %}
+          <li class="product-photo-thumb two-per-row">
+            <a href="{{ image | img_url: '1024x1024' }}">
+              <img src="{{ image | img_url: 'large' }}" alt="{{ image.alt | escape }}" />
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      
+      {% endif %}
+
+      </div><!-- .product-photos -->
+    </div>
+
+    <div class="col-md-6">
+      <div class="product-details" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+        {% comment %}
+          Get first variant, or deep linked one
+        {% endcomment %}
+        {% assign variant = product.selected_or_first_available_variant %}
+        
+        <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+        <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+        <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+        <meta itemprop="price" content="{{ variant.price | money }}">
+
+        <link itemprop="availability" href="http://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}">
+
+        <h1 itemprop="name">{{ product.title }}</h1>
+        
+        {% assign product_vendor_handle = product.vendor | handle %}
+        {% comment %}
+        Do we have a collection that has the same name as our product vendor name?
+        If we do, let's have the vendor link point to it.
+        If not, we will point to the automatic vendor collection.
+        {% endcomment %}
+        {% if collections[product_vendor_handle].handle == product_vendor_handle %}
+          {% assign vendor_url = collections[product_vendor_handle].url %}
+        {% else %}
+          {% assign vendor_url = product.vendor | url_for_vendor %}
+        {% endif %}
+        <h2 itemprop="brand">{{ product.vendor | link_to: vendor_url }}</h2>
+        
+        <div id="product-description" class="rte" itemprop="description">
+          {{ product.description }}
+        </div>
+        
+        <div id="product-price">
+          <p>
+            {% if product.compare_at_price > product.price %}
+            <span class="product-price on-sale" itemprop="price">{{ variant.price | money }}</span>
+            <span class="product-compare-price">{{ variant.compare_at_price | money }}</span>
+            {% else %}
+            <span class="product-price" itemprop="price">{{ variant.price | money }}</span>
+            {% endif %}
+          </p>
+        </div>
+        
+        {% assign hide_default_title = false %}
+        {% if product.variants.size == 1 and product.variants.first.title contains 'Default' %}
+          {% assign hide_default_title = true %}
+        {% endif %}
+
+        <form action="/cart/add" method="post" enctype="multipart/form-data">   
+
+          <div id="product-variants" class="{% if hide_default_title %} hidden{% endif %}">
+            <select id="product-select" name="id">
+            {% for variant in product.variants %}
+              <option{% if variant == product.selected_or_first_available_variant %} selected{% endif %} value="{{ variant.id }}">
+              {{ variant.title }} - {{ variant.price | money }}
+              </option>
+            {% endfor %}
+            </select>
+          </div>        
+                 
+          <div id="backorder" class="hidden">
+            <p>{{ '%s is back-ordered. We will ship it separately in 10 to 15 days.' | replace: '%s', '<span id="selected-variant"></span>' }}</p>
+          </div>
+            
+          <div id="product-add">
+            <input type="submit" name="add" id="add" class="btn btn-primary" value="{{ add_to_cart | escape }}">
+          </div>
+
+        </form>
+        
+        {% if collection %}
+          {% if collection.previous_product or collection.next_product %}
+          <div>     
+          {% if collection.previous_product %}
+            {% capture prev_url %}{{ collection.previous_product}}#content{% endcapture %}
+            <span class="left">{{ '&larr; Previous Product' | link_to: prev_url }}</span>
+          {% endif %}
+          {% if collection.next_product %}
+            {% capture next_url %}{{ collection.next_product}}#content{% endcapture %}
+            <span class="right">{{ 'Next Product &rarr;' | link_to: next_url }}</span>
+          {% endif %}
+          </div>
+          {% endif %}
+        {% endif %}
+        
+      </div><!-- .product-details -->
+    </div>
+  </div>
+</div>
+
+{% comment %}
+  Adding support for product options. See here for details:  
+  http://docs.shopify.com/support/your-website/themes/can-i-make-my-theme-use-products-with-multiple-options
+{% endcomment %}
+{{ 'option_selection.js' | shopify_asset_url | script_tag }}
+<script>
+  var selectCallback = function(variant, selector) {
+
+    if (variant) {
+      
+      // Swap image.
+      if (variant.featured_image) {
+        var newImage = variant.featured_image; // New image object.
+        var mainImageDomEl = jQuery('.product-photo-container img')[0]; // DOM element of main image we need to swap.
+        Shopify.Image.switchImage(newImage, mainImageDomEl, switchImage); // Define switchImage (the callback) in your theme's JavaScript file.
+      }
+      
+      // Selected a valid variant that is available.
+      if (variant.available) {
+            
+        // Enabling add to cart button.
+        jQuery('#add').removeClass('disabled').prop('disabled', false).val({{ add_to_cart | json }});
+      
+        // If item is backordered yet can still be ordered, we'll show special message.
+        if (variant.inventory_management && variant.inventory_quantity <= 0) {
+          jQuery('#selected-variant').html({{ product.title | json }}{% unless hide_default_title %} + ' - ' + variant.title{% endunless %});
+          jQuery('#backorder').removeClass("hidden");
+        } else {
+          jQuery('#backorder').addClass("hidden");
+        }
+        
+      } else {
+        // Variant is sold out.
+        jQuery('#backorder').addClass('hidden');
+        jQuery('#add').val({{ sold_out | json }}).addClass('disabled').prop('disabled', true);       
+      }
+      
+      // Whether the variant is in stock or not, we can update the price and compare at price.
+      if ( variant.compare_at_price > variant.price ) {
+        jQuery('#product-price').html('<span class="product-price on-sale">'+ Shopify.formatMoney(variant.price, "{{ shop.money_format }}") +'</span>'+'&nbsp;<s class="product-compare-price">'+Shopify.formatMoney(variant.compare_at_price, "{{ shop.money_format }}")+ '</s>');
+      } else {
+        jQuery('#product-price').html('<span class="product-price">'+ Shopify.formatMoney(variant.price, "{{ shop.money_format }}") + '</span>' );
+      }        
+
+    } else {
+      // variant doesn't exist.
+      jQuery('#product-price').empty();
+      jQuery('#backorder').addClass('hidden');
+      jQuery('#add').val({{ unavailable | json }}).addClass('disabled').prop('disabled', true);
+    }
+
+  };
+    
+  jQuery(function($) {
+
+    new Shopify.OptionSelectors('product-select', {
+      product: {{ product | json }}, 
+      onVariantSelected: selectCallback, 
+      enableHistoryState: true
+    });
+    
+    // Add label if only one product option and it isn't 'Title'.
+    {% if product.options.size == 1 and product.options.first != 'Title' %}
+      $('.selector-wrapper:eq(0)').prepend('<label>{{ product.options.first }}</label>');
+    {% endif %}
+
+    // Hide selectors if we only have 1 variant and its title contains 'Default'.
+    {% if product.variants.size == 1 and product.variants.first.title contains 'Default' %}
+      $('.product-single__variants').hide();
+    {% endif %}
+
+  });
+
+  Shopify.Image.preload({{ product.images | json }}, 'grande');
+  Shopify.Image.preload({{ product.images | json }}, '1024x1024');
+
+</script>

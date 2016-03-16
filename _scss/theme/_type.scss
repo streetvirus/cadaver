@@ -1,0 +1,15 @@
+.quiet { 
+  color: lighten( $text-color, 10% ); 
+}
+
+.hint { 
+  color: lighten( $text-color, 15% ); 
+}
+
+i, em { 
+  font-style: italic; 
+}
+
+b, strong { 
+  font-weight: 600; 
+}

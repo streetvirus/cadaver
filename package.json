@@ -1,0 +1,7 @@
+{
+  "name": "shopify-css-import",
+  "devDependencies": {
+    "gulp": "~3.8.11",
+    "gulp-cssimport": "~3.0.2"
+  }
+}

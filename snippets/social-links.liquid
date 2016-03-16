@@ -1,0 +1,17 @@
+{% unless settings.social_facebook_link == blank %}
+  <a href="{{ settings.social_facebook_link }}" title="Follow us on Facebook" target="_blank">
+    <span class="shopify-social-icon-facebook{{ settings.social_icons_style }}"></span>
+  </a>
+{% endunless %}
+
+{% unless settings.social_twitter_link == blank %}
+  <a href="{{ settings.social_twitter_link }}" title="Follow us on Twitter" target="_blank">
+    <span class="shopify-social-icon-twitter{{ settings.social_icons_style }}"></span>
+  </a>
+{% endunless %}
+
+{% unless settings.social_instagram_link == blank %}
+  <a href="{{ settings.social_instagram_link }}" title="Follow us on Instagram" target="_blank">
+    <span class="shopify-social-icon-instagram{{ settings.social_icons_style }}"></span>
+  </a>
+{% endunless %}

@@ -1,0 +1,20 @@
+{
+  "current": "Carcass",
+  "presets": {
+    "Carcass": {
+      "customer_layout": "theme",
+      "background_color": "#FFF",
+      "text_color": "#333",
+      "link_color": "#B72206",
+      "use_logo": false,
+      "homepage_page": "frontpage",
+      "homepage_collection": "frontpage",
+      "products_per_row": "3",
+      "number_of_rows": "4",
+      "social_facebook_link": "",
+      "social_instagram_link": "",
+      "social_twitter_link": "",
+      "social_icons_style": ""
+    }
+  }
+}

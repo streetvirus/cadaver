@@ -1,0 +1,7 @@
+--- 
+:api_key: { api_key }
+:password: { password }
+:store: { yourstore }.myshopify.com
+:theme_id: { theme_id }
+:ignore_files:
+- config.yml

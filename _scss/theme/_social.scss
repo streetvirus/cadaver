@@ -1,0 +1,11 @@
+.social-links {
+  font-size: 2.4rem;
+  a {
+    display: inline-block;
+    padding-right: $grid-gutter-width / 12;
+    text-decoration: none;
+  }
+}
+
+/* IE8 does not support SVG. */
+.lt-ie9 .payment-types { display:none; }

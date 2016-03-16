@@ -1,0 +1,18 @@
+header {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+#site-title {
+  display: block;
+  color: $text-color;
+  text-decoration: none;
+}
+
+#logo {
+  display: block;
+  margin: $grid-gutter-width/4 auto;
+  img {
+    max-height: 180px;
+  }
+}

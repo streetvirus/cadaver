@@ -1,0 +1,146 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9 ]><html class="ie9 no-js"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js" lang="en"> <!--<![endif]-->  
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>
+  {{ page_title }}{% if current_tags %}{% assign meta_tags = current_tags | join: ', ' %} &ndash; Tagged \"{{ meta_tags }}\"{% endif %}{% if current_page != 1 %} &ndash; Page {{ current_page }}{% endif %}{% unless page_title contains shop.name %} | {{ shop.name }}{% endunless %}
+  </title>
+
+  {% if page_description %}
+  <meta name="description" content="{{ page_description | escape }}" />
+  {% endif %}
+
+  <!-- Social Tags -->
+  {% include 'open-graph-tags' %}
+  {% include 'twitter-card' %}
+
+  <link rel="canonical" href="{{ canonical_url }}" />
+  
+  {{ 'main.scss.css' | asset_url | stylesheet_tag }}
+  {{ 'social/social-icons.css' | global_asset_url | stylesheet_tag }}
+  {{ '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css' | stylesheet_tag }}
+
+
+  {{ content_for_header }}
+
+  {% comment %}
+    If you store has customers disabled, you can remove the following JS file
+  {% endcomment %}
+  {% if template contains 'customers' %}
+    {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+    {{ 'customer_area.js'  | shopify_asset_url | script_tag }}
+  {% endif %}
+  
+  <!--[if lt IE 9]>
+  {{ '//html5shiv.googlecode.com/svn/trunk/html5.js' | script_tag }}
+  <![endif]-->
+  
+  {{ '//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js' | script_tag }}
+  {{ 'modernizr.min.js' | asset_url | script_tag }}
+  <script>jQuery('html').removeClass('no-js').addClass('js');</script>
+
+</head>
+
+<body id="{{ page_title | handle }}" class="{% if customer %}customer-logged-in {% endif %}template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}" >
+
+  <header>
+    <div class="container">
+      <div class="row">
+        
+        <div class="col-md-6 col-lg-6">
+          <div class="social-links">
+            {% include 'social-links' %}
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-6">
+          <div class="cart-link" style="text-align: right">
+            <a href="/cart"><img src="{{ 'cart.svg' | asset_url }}" /> {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }} ({{ cart.total_price | money }})</a>
+          </div>
+              
+          {% if shop.customer_accounts_enabled %}
+          <div class="customer-links">
+            {% if customer %}
+              Logged in as <a href="/account">{{ customer.first_name }}</a> · {{ 'Log out' | customer_logout_link }}
+            {% else %}
+              {{ 'Log in' | customer_login_link }}
+              {% if shop.customer_accounts_optional %}
+              or {{ 'Create an account' | customer_register_link }}
+              {% endif %}
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="col-lg-12">
+          <div style="text-align: center" role="banner">
+            {% if settings.use_logo %}
+            <a id="logo" href="/">
+              {{ 'logo.png' | asset_url | img_tag: shop.name }}
+            </a>
+            {% else %}
+            <a id="site-title" href="/">
+              {{ shop.name }}
+            </a>
+            {% endif %}
+            {% if template == 'index' %}
+            {% comment %}
+              Many SEO audit tools look for a h1 tag on the home page. Let's give 'em one.
+              Other pages should use the resource name as h1 tag. For example, on the product
+              page, the product title will use a h1 tag.
+            {% endcomment %}
+            <h1 class="hidden">{{ shop.name }}</h1>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-lg-12">
+          <div>
+            {% include 'site-nav' %}
+              
+            <form action="/search" method="get" class="search-form right" role="search">
+              <input name="q" type="search" id="search-field" class="form-control" placeholder="Search store..." value="{{ search.terms | escape }}" />
+              <input type="submit" id="search-submit" class="btn" value="Search" />
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <div id="main" role="main">
+    <div class="container">
+      {{ content_for_layout }}
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="row">
+        {% if linklists.footer.links.size > 0 %}
+        <p role="navigation">
+        {% for link in linklists.footer.links %}
+          <a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a>
+        {% endfor %}
+        </p>
+        {% endif %}
+        
+        <p role="contentinfo">Copyright &copy; {{ "now" | date: "%Y" }} {{ shop.name }}</p>
+      </div>
+    </div>
+  </footer>
+    
+  {{ 'shop.js'  | asset_url | script_tag }}
+
+</body>
+</html>
