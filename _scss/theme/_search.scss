@@ -1,12 +1,10 @@
 /* Override to globally-hosted search.css on the /search page */
 #searchresults {
-  @extend .paragraph-margins;
+
 }
 /* Styling all search forms. You can reuse this for newsletter signup form. */
 .search-form {
   display: inline-block;
-  // margin-top: .2 * $base-font-size;
-  @extend .inline-collapse;  
 }
 /* Hiding search form in header on small screens */
 @media (max-width: $screen-xs) {

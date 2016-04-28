@@ -16,12 +16,12 @@
       
       <thead>
         <tr>
-          <th class="hide-on-small">Item</th>
+          <th>Item</th>
           <th>&nbsp;</th>
-          <th class="hide-on-small">Price</th>
+          <th>Price</th>
           <th>Quantity</th>
           <th>Total</th>
-          <th class="hide-on-small">&nbsp;</th>
+          <th>&nbsp;</th>
         </tr>
       </thead>
       
@@ -43,7 +43,7 @@
         {% endif %}
 
         <tr>
-          <td class="hide-on-small">
+          <td>
             <a href="{{ collection_url }}{{ item.url }}">
               <img src="{{ item | img_url: 'compact' }}"  alt="{{ item.title | escape }}" />
             </a>
@@ -75,12 +75,12 @@
             {% endif %}
             <h3>{{ item.vendor }}</h3>
           </td>
-          <td class="hide-on-small">{{ item.price | money }}</td>
+          <td>{{ item.price | money }}</td>
           <td>
             <input type="number" name="updates[]" id="updates_{{ item.id }}" class="quantity form-control" value="{{ item.quantity }}" />
           </td>
           <td>{{ item.line_price | money }}</td>
-          <td class="hide-on-small">
+          <td>
             <a href="/cart/change?line={{ forloop.index }}&quantity=0">Remove</a>
           </td>
         </tr>
@@ -108,8 +108,8 @@
       {% endcomment %}
       <div class="text-right">
         <h3>Subtotal <em>{{ cart.total_price | money }}</em></h3>
-        <a class="hide-on-small" href="{{ continue_shopping_url }}">Continue shopping</a>
-        <span class="or hide-on-small">or</span>
+        <a href="{{ continue_shopping_url }}">Continue shopping</a>
+        <span class="or">or</span>
         <input type="submit" name="update" value="Update cart" class="btn" />
         <span class="or">or</span>
         <input type="submit" name="checkout" value="Check out" class="btn" />    

@@ -881,6 +881,7 @@ $text-color:            {{ settings.text_color }};
 $link-color:            {{ settings.link_color }};
 $link-hover-color:      darken($link-color, 15%);
 
+
 // Mixins
 // --------------------------------------------------
 
@@ -8026,7 +8027,6 @@ button.close {
   @include responsive-invisibility('.hidden-print');
 }
 
-
 // Theme Components
 .quiet { 
   color: lighten( $text-color, 10% ); 
@@ -8203,58 +8203,39 @@ is below it. */
   10. Product and collection pages.
   ========================================================================== */
 
-.product-details > div,
-.product-details > p {
-  @extend .section-margins;
-}
-
-.product-photo-container {
-  @extend .grid-margins;
-}
-
 /* Quickly hiding default variant drop-down when JavaScript is enabled */
 /* See this: http://www.learningjquery.com/2008/10/1-way-to-avoid-the-flash-of-unstyled-content/ */
 .js #product-select { display: none; }
 
 /* Product option wrapper. */
 .selector-wrapper {
-  @extend .paragraph-margins;
+
 }
 
 .sort-by {
-  margin-top: .25rem;
+  
 }
 
 @media (max-width: $screen-xs) {
   .sort-by {
-    float: none;
-    margin-bottom: $grid-gutter-width / 2;
+
   }
 }
 
 .prod-caption {
-  margin: $grid-gutter-width/12 0;
+
 }
 
 .product-photo-thumb:nth-child(2n+1) {
-  clear: both;
-}
 
-@media (max-width: $screen-xs) {
-  .two-per-row.product-photo-thumb {
-    width: 50% !important;
-    float: left !important;
-  }  
 }
 /* Override to globally-hosted search.css on the /search page */
 #searchresults {
-  @extend .paragraph-margins;
+
 }
 /* Styling all search forms. You can reuse this for newsletter signup form. */
 .search-form {
   display: inline-block;
-  // margin-top: .2 * $base-font-size;
-  @extend .inline-collapse;  
 }
 /* Hiding search form in header on small screens */
 @media (max-width: $screen-xs) {
