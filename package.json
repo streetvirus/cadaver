@@ -1,5 +1,5 @@
 {
-  "name": "shopify-css-import",
+  "name": "cadaver",
   "devDependencies": {
     "gulp": "~3.8.11",
     "gulp-cssimport": "~3.0.2"
