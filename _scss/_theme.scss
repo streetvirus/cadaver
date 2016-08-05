@@ -1,10 +1,4 @@
 // Theme Components
+@import url("theme/_components.scss");
 @import url("theme/_type.scss");
-@import url("theme/_header.scss");
-@import url("theme/_nav.scss");
-@import url("theme/_tags.scss");
-@import url("theme/_social.scss");
-@import url("theme/_blog.scss");
-@import url("theme/_product.scss");
-@import url("theme/_search.scss");
-@import url("theme/_footer.scss");
+@import url("theme/_views.scss");

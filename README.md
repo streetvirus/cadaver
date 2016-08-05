@@ -11,8 +11,10 @@ __Features:__
 
 ### Project Structure
 ```
+├── _js
+│   └── Working javascript files.  Compiles and minfies with gulp and exports to assets directory
 ├── _scss
-│   └── Working scss files.  Compiles with gulp and exports to assets dir
+│   └── Working scss files.  Compiles with gulp and exports to assets directory
 ├── assets
 │   └── Javascript, CSS, and theme images
 ├── config
@@ -46,3 +48,17 @@ gulp
 ```
 
 If using the Shopify Theme Gem for development, follow the [setup instructions](https://github.com/Shopify/shopify_theme) and then run ```theme watch``` to start pushing the theme to your store.
+
+### Development
+
+Javascript work is done in the ``_js`` directory.  The gulp scripts task minifies and checks files for errors before exporting them to the assets directory.  We are using jshint for error checking, [see the docs](http://jshint.com/docs/) for more info on how to use it.
+
+Scss work is done in the ``_scss`` directory.  Right now there is a single entry point for the stylesheet called ``app.scss.liquid``. The gulp styles task inlines all ``@import`` directives and exports a single scss file to the assets directory.  Due to the way Shopify compiles scss, we have to use a css inliner for imported files which means we have to use the native css ``@import`` syntax _not_ the scss one.
+
+```scss
+// Do this
+@import url("theme/_pages.scss");
+
+// Not this
+@import "theme/pages"
+```

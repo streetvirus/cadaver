@@ -1,4 +1,3 @@
-// Core variables and mixins
 $bootstrap-sass-asset-helper: false !default;
 //
 // Variables
@@ -873,14 +872,6 @@ $dl-horizontal-offset:        $component-offset-horizontal !default;
 $dl-horizontal-breakpoint:    $grid-float-breakpoint !default;
 //** Horizontal line color.
 $hr-border:                   $gray-lighter !default;
-
-// Theme Overrides
-// Bootstrap override variables
-$body-bg:               {{ settings.background_color }};
-$text-color:            {{ settings.text_color }};
-$link-color:            {{ settings.link_color }};
-$link-hover-color:      darken($link-color, 15%);
-
 
 // Mixins
 // --------------------------------------------------
@@ -8028,21 +8019,6 @@ button.close {
 }
 
 // Theme Components
-.quiet { 
-  color: lighten( $text-color, 10% ); 
-}
-
-.hint { 
-  color: lighten( $text-color, 15% ); 
-}
-
-i, em { 
-  font-style: italic; 
-}
-
-b, strong { 
-  font-weight: 600; 
-}
 header {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -8122,6 +8098,38 @@ nav ul {
 
 /* IE8 does not support SVG. */
 .lt-ie9 .payment-types { display:none; }
+/* Override to globally-hosted search.css on the /search page */
+#searchresults {
+
+}
+/* Styling all search forms. You can reuse this for newsletter signup form. */
+.search-form {
+  display: inline-block;
+}
+/* Hiding search form in header on small screens */
+@media (max-width: $screen-xs) {
+  header .search-form {
+    display: none;
+  }
+}
+footer {
+  text-align: center;
+}
+.quiet { 
+  color: lighten( $text-color, 10% ); 
+}
+
+.hint { 
+  color: lighten( $text-color, 15% ); 
+}
+
+i, em { 
+  font-style: italic; 
+}
+
+b, strong { 
+  font-weight: 600; 
+}
 /* Separating articles with a border on the blog landing page.*/
 .template-blog .article {
   border-bottom: darken( $body-bg, 5%) 0.07rem solid;
@@ -8228,21 +8236,4 @@ is below it. */
 
 .product-photo-thumb:nth-child(2n+1) {
 
-}
-/* Override to globally-hosted search.css on the /search page */
-#searchresults {
-
-}
-/* Styling all search forms. You can reuse this for newsletter signup form. */
-.search-form {
-  display: inline-block;
-}
-/* Hiding search form in header on small screens */
-@media (max-width: $screen-xs) {
-  header .search-form {
-    display: none;
-  }
-}
-footer {
-  text-align: center;
 }
