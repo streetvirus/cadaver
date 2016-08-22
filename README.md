@@ -31,10 +31,11 @@ __Features:__
 │   ├── cart.liquid
 │   ├── collection.liquid
 │   ├── index.liquid
+│   ├── list-collections.liquid
 │   ├── page.liquid
 │   ├── product.liquid
 │   └── search.liquid
-│   └── list-collections.liquid
+
 ```
 
 ### Getting Started
@@ -62,3 +63,19 @@ Scss work is done in the ``_scss`` directory.  Right now there is a single entry
 // Not this
 @import "theme/pages"
 ```
+
+### Theme Features
+
+There are a few things about the theme to be aware of in order to get the most out of it.
+
+##### Favicons
+
+To add favicons, see the snippet ``favicon.liquid``.  There are 4 icon sizes that need to be generated and added to the assets folder.  See [realfavicongenerator.net](http://realfavicongenerator.net) to create these.
+
+##### Font Icons
+
+The site currently uses the Font Awesome font icon library.  To keep the CSS file as lightweight as possible, comment out unused icon rules in ``_scss/font-awesome/_icons.scss``.
+
+##### Open Graph Images
+
+All open graph tags are contained in the snippet ``open-graph-tags.liquid``.  OG images are generated from the store logo, product page images or blog images.  To add default share images, generate them following the [best practice guidelines](https://developers.facebook.com/docs/sharing/best-practices#images) and hard code them in the snippet.

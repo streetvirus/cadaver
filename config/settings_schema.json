@@ -176,33 +176,6 @@
         "id": "social_facebook_link",
         "label": "Facebook",
         "info": "https:\/\/www.facebook.com\/shopify"
-      },
-      {
-        "type": "header",
-        "content": "Icons"
-      },
-      {
-        "type": "select",
-        "id": "social_icons_style",
-        "label": "Icon Style",
-        "options": [
-          {
-            "value": "",
-            "label": "Silhouette"
-          },
-          {
-            "value": "-circle",
-            "label": "Circle"
-          },
-          {
-            "value": "-rounded",
-            "label": "Rounded corners"
-          },
-          {
-            "value": "-square",
-            "label": "Square"
-          }
-        ]
       }
     ]
   }

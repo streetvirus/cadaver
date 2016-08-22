@@ -1,0 +1,66 @@
+<header>
+  <div class="container">
+    <div class="row">
+      
+      <div class="col-md-6 col-lg-6">
+        <div class="social-links">
+          {% include 'social-links' %}
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-6">
+        <div class="cart-link" style="text-align: right">
+          <a href="/cart"><img src="{{ 'cart.svg' | asset_url }}" /> {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }} ({{ cart.total_price | money }})</a>
+        </div>
+            
+        {% if shop.customer_accounts_enabled %}
+        <div class="customer-links">
+          {% if customer %}
+            Logged in as <a href="/account">{{ customer.first_name }}</a> · {{ 'Log out' | customer_logout_link }}
+          {% else %}
+            {{ 'Log in' | customer_login_link }}
+            {% if shop.customer_accounts_optional %}
+            or {{ 'Create an account' | customer_register_link }}
+            {% endif %}
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-12">
+        <div style="text-align: center" role="banner">
+          {% if settings.use_logo %}
+          <a id="logo" href="/">
+            {{ 'logo.png' | asset_url | img_tag: shop.name }}
+          </a>
+          {% else %}
+          <a id="site-title" href="/">
+            {{ shop.name }}
+          </a>
+          {% endif %}
+          {% if template == 'index' %}
+          {% comment %}
+            Many SEO audit tools look for a h1 tag on the home page. Let's give 'em one.
+            Other pages should use the resource name as h1 tag. For example, on the product
+            page, the product title will use a h1 tag.
+          {% endcomment %}
+          <h1 class="hidden">{{ shop.name }}</h1>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-lg-12">
+        <div>
+          {% include 'site-nav' %}
+            
+          <form action="/search" method="get" class="search-form right" role="search">
+            <input name="q" type="search" id="search-field" class="form-control" placeholder="Search store..." value="{{ search.terms | escape }}" />
+            <input type="submit" id="search-submit" class="btn" value="Search" />
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>

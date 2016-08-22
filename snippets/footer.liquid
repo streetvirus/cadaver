@@ -1,0 +1,15 @@
+<footer>
+  <div class="container">
+    <div class="row">
+      {% if linklists.footer.links.size > 0 %}
+      <p role="navigation">
+      {% for link in linklists.footer.links %}
+        <a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a>
+      {% endfor %}
+      </p>
+      {% endif %}
+      
+      <p role="contentinfo">Copyright &copy; {{ "now" | date: "%Y" }} {{ shop.name }}</p>
+    </div>
+  </div>
+</footer>
