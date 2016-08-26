@@ -1,0 +1,101 @@
+<h1>Account</h1>
+
+<div>
+  <h2>Orders</h2>
+  {% paginate customer.orders by 20 %}
+
+    {% if customer.orders.size != 0 %}
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order Number</th>
+            <th>Date</th>
+            <th>Payment Status</th>
+            <th>Fulfillment Status</th>
+            <th>Order Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in customer.orders %}
+            <tr>
+              <td>{{ order.name | link_to: order.customer_url }}</td>
+              <td>{{ order.created_at | date: "%b %d, %Y" }}</td>
+              <td>{{ order.financial_status_label }}</td>
+              <td>{{ order.fulfillment_status_label }}</td>
+              <td>{{ order.total_price | money }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% if paginate.pages > 1 %}
+        <div class="text-center">
+          {{ paginate | default_pagination }}
+        </div>
+      {% endif %}
+
+    {% else %}
+
+      <p class="text-center">No Orders Found</p>
+
+    {% endif %}
+
+  {% endpaginate %}
+</div>
+
+<div>
+  <h4>Account Details</h4>
+
+  <h5>{{ customer.name }}</h5>
+
+  {% if customer.default_address != nil %}
+
+    <address>
+      {% comment %} Line 1 {% endcomment %}
+      {{ customer.default_address.address1 }}
+
+      {% if customer.default_address.address2 != "" %}
+        {{ customer.default_address.address2 }}
+      {% endif %}
+      <br />
+
+      {% comment %} Line 2 {% endcomment %}
+      {% if customer.default_address.city != "" %}
+        {{ customer.default_address.city }}
+      {% endif %}
+
+      {% if customer.default_address.province_code != "" %}
+        {{ customer.default_address.province_code | upcase }}
+      {% endif %}
+
+      {% if customer.default_address.zip != "" %}
+        {{ customer.default_address.zip | upcase }}
+      {% endif %}
+
+      {% if customer.default_address.city != "" or customer.default_address.province_code != "" or customer.default_address.zip != "" %}
+        <br />
+      {% endif %}
+
+      {% comment %} Line 3 {% endcomment %}
+      {% if customer.default_address.country != "" %}
+        {{ customer.default_address.country }}
+        <br />
+      {% endif %}
+
+      {% comment %} Line 4 {% endcomment %}
+      {% if customer.default_address.phone != "" %}
+        {{ customer.default_address.phone }}
+      {% endif %}
+    </address>
+
+  {% else %}
+
+    <p>You haven't entered an address yet</p>
+
+  {% endif %}
+  
+  <p><a href="/account/addresses">View Addresses</a></p>
+  <p><a href="/account/logout">Log Out</a></p>
+
+</div>

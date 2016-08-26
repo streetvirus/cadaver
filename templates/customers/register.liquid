@@ -1,0 +1,34 @@
+<h1>Register for an Account</h1>
+
+{% form 'create_customer' %}
+
+  {{ form.errors | default_errors }}
+  
+  <fieldset class="form-group">
+    <label for="first-name">First Name</label>
+    <input type="text" name="customer[first_name]" id="first-name" class="form-control" {% if form.first_name %}value="{{ form.first_name }}"{% endif %} autocapitalize="words" autofocus>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <label for="last-name">Last Name</label>
+    <input type="text" name="customer[last_name]" id="last-name" class="form-control" {% if form.last_name %}value="{{ form.last_name }}"{% endif %} autocapitalize="words">
+  </fieldset>
+
+  <fieldset class="form-group{% if form.errors contains "email" %} has-error{% endif %}">
+    <label for="email">Email</label>
+    <input type="email" name="customer[email]" id="email" class="form-control"{% if form.email != blank %} value="{{ form.email }}"{% endif %} autocorrect="off" autocapitalize="off">
+  </fieldset>
+  
+  <fieldset class="form-group{% if form.errors contains "password" %} has-error{% endif %}">
+    <label for="create-password">Password</label>
+    <input type="password" name="customer[password]" id="create-password" class="form-control">
+  </fieldset>
+
+  <p>
+    <input type="submit" value="Submit" class="btn btn-primary btn-block">
+  </p>
+  <p class="text-center">
+    <a href="{{ shop.url }}">Cancel</a>
+  </p>
+
+{% endform %}
