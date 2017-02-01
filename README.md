@@ -1,6 +1,6 @@
 # Cadaver Theme
 
-The Cadaver theme is a simplified Shopify theme, to be used as a "blank slate" starting point for theme designers.  When I say 'basic' I really mean it.  All of Bootstrap is included if you want to use it, but it's main utility is baseline styling and boring stuff like forms and tables.  Comment out all the things you don't need and save yourself the bloat.
+The Cadaver theme is a simplified Shopify theme, to be used as a "blank slate" starting point for theme designers.  When I say 'basic' I really mean it.  Bootstrap and Font Awesome are included to get you going quickly but neither are required.  Comment out all the things you don't need and save yourself the bloat.
 
 __Features:__
 - Almost no theme settings.

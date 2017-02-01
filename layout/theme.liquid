@@ -61,5 +61,9 @@
       
     {{ 'app.js'  | asset_url | script_tag }}
 
+    {% if template contains 'product' %}
+      {{ 'product.js' | asset_url | script_tag }}
+    {% endif %}
+
   </body>
 </html>

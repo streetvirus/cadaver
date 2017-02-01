@@ -5077,7 +5077,7 @@ tbody.collapse.in { display: table-row-group; }
   }
 }
 
-// //
+//
 // Navs
 // --------------------------------------------------
 
@@ -9743,6 +9743,14 @@ $fa-var-youtube-square: "\f166";
 
 
 // Theme Components
+// Variables required by the starter files in the 'theme' directory
+// If you choose not to use Bootstrap you'll have to define the following 
+// variables below *or* remove their references in 'theme/*' files
+
+// $text-color
+// $body-bg
+// $grid-gutter-width
+// $screen-xs
 header {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -9785,31 +9793,6 @@ nav ul {
       padding-right: 0;
     }
   }
-}
-.tag {
-  @extend .btn;
-  margin: 0 $grid-gutter-width/6 $grid-gutter-width/6 0;
-  padding: .2em .5em;
-  a {
-    text-decoration: none;
-    color: $text-color;
-  }
-  &.active {
-    background-color: $link-color;
-    border-color: $link-color;  
-    a {
-      color: $body-bg;
-    }
-  }
-}
-
-.subcategories, .blog-tags {
-  font-size: 0;
-}
-
-.subcategories > li, .blog-tags > li {
-  @extend .tag;
-  font-size: 0.85 * $font-size-base;
 }
 .social-links {
   font-size: 2.4rem;
@@ -9938,26 +9921,3 @@ is below it. */
 /* Quickly hiding default variant drop-down when JavaScript is enabled */
 /* See this: http://www.learningjquery.com/2008/10/1-way-to-avoid-the-flash-of-unstyled-content/ */
 .js #product-select { display: none; }
-
-/* Product option wrapper. */
-.selector-wrapper {
-
-}
-
-.sort-by {
-  
-}
-
-@media (max-width: $screen-xs) {
-  .sort-by {
-
-  }
-}
-
-.prod-caption {
-
-}
-
-.product-photo-thumb:nth-child(2n+1) {
-
-}
