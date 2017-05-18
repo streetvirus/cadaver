@@ -1,0 +1,24 @@
+{% comment %}
+  This is a template for creating a new section.
+  - 'data-section-id' is required for the theme editor
+  - 'data-section-type' is required for the theme editor (can be labeled whatever you want).  This string must be used when registering the section in the main JS file
+{% endcomment %}
+
+<div data-section-id="{{ section.id }}" data-section-type="boilerplate-section">
+  {% if section.settings.test_text != blank %}
+    Text: {{ section.settings.test_text }}
+  {% endif %}
+</div>
+
+{% schema %}
+  {
+    "name": "Boilerplate",
+    "settings": [
+      {
+        "type": "text",
+        "id": "test_text",
+        "label": "Text to put in this section"
+      }
+    ]
+  }
+{% endschema %}

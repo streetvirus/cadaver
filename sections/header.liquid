@@ -1,11 +1,13 @@
-<header>
+<header data-section-id="{{ section.id }}" data-section-type="header-section">
   <div class="container">
     <div class="row">
       
       <div class="col-md-6 col-lg-6">
-        <div class="social-links">
-          {% include 'social-links' %}
-        </div>
+        {% if section.settings.social_links %}
+          <div class="social-links">
+            {% include 'social-links' %}
+          </div>
+        {% endif %}
       </div>
 
       <div class="col-md-6 col-lg-6">
@@ -29,9 +31,9 @@
 
       <div class="col-lg-12">
         <div style="text-align: center" role="banner">
-          {% if settings.use_logo %}
+          {% if section.settings.logo %}
           <a id="logo" href="/">
-            {{ 'logo.png' | asset_url | img_tag: shop.name }}
+            {{ section.settings.logo | img_url: '300x' | img_tag: shop.name }}
           </a>
           {% else %}
           <a id="site-title" href="/">
@@ -64,3 +66,21 @@
     </div>
   </div>
 </header>
+
+{% schema %}
+  {
+    "name": "Header",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "checkbox",
+        "id": "social_links",
+        "label": "Show social links"
+      }
+    ]
+  }
+{% endschema %}

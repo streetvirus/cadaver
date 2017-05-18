@@ -1,9 +1,12 @@
 # Cadaver Theme
 
-The Cadaver theme is a simplified Shopify theme, to be used as a "blank slate" starting point for theme designers.  When I say 'basic' I really mean it.  Bootstrap and Font Awesome are included to get you going quickly but neither are required.  Comment out all the things you don't need and save yourself the bloat.
+Cadaver is a simplified Shopify theme, to be used as a "blank slate" starting point for theme developers.  When I say 'basic' I really mean it.  Bootstrap and Font Awesome are included to get you going quickly but neither are required.  Comment out all the things you don't need and save yourself the bloat.
+
+My intention when starting this project was to create something with more features than [Skeleton](http://shopify.github.io/skeleton-theme/) but less overhead than [Timber](https://shopify.github.io/Timber/) or [Slate](https://github.com/Shopify/slate).  I also wanted something that I could clone and start developing immediately without having to tear out old code or feel constrained my pre-existing CSS. Out of the box this theme doesn't look like much, but the boilerplate code and defaults mean you should be able to make this look halfway decent with a few days of work.
 
 __Features:__
-- Almost no theme settings.
+- Minimal theme settings.
+- Minimal JS framework for utilizing Shopify sections.
 - Commented code to teach you Liquid concepts in practice.
 - Gulp task to inline scss files allowing theme stylesheets to be broken up since Shopify doesn't support scss importing.
 - Bootstrap is included to take advantage of the grid.  File imports have been modified to work with gulp-cssimport (native SCSS import syntax not supported)
@@ -22,6 +25,8 @@ __Features:__
 ├── layout
 │   ├── theme.liquid
 │   └── optional alternate layouts
+├── sections
+│   ├── shopify sections
 ├── snippets
 │   └── optional custom code snippets
 ├── templates
@@ -35,7 +40,6 @@ __Features:__
 │   ├── page.liquid
 │   ├── product.liquid
 │   └── search.liquid
-
 ```
 
 ### Getting Started
@@ -48,7 +52,7 @@ npm install
 gulp
 ```
 
-If using the Shopify Theme Gem for development, follow the [setup instructions](https://github.com/Shopify/shopify_theme) and then run ```theme watch``` to start pushing the theme to your store.
+If using Shopify Theme Kit for development, follow the [setup instructions](https://shopify.github.io/themekit/) and then run ```theme watch``` to start pushing the theme to your store.
 
 ### Development
 
@@ -79,3 +83,11 @@ The site currently uses the Font Awesome font icon library.  To keep the CSS fil
 ##### Open Graph Images
 
 All open graph tags are contained in the snippet ``open-graph-tags.liquid``.  OG images are generated from the store logo, product page images or blog images.  To add default share images, generate them following the [best practice guidelines](https://developers.facebook.com/docs/sharing/best-practices#images) and hard code them in the snippet.
+
+##### Sections
+
+This theme comes with 3 sections - header, footer and featured collection to be used on the home page.
+
+### TODO
+
+- Clean up and fix collection grid and product grid item.

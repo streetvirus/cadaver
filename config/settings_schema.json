@@ -28,54 +28,6 @@
     ]
   },
   {
-    "name": "Header",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Logo Options"
-      },
-      {
-        "type": "checkbox",
-        "id": "use_logo",
-        "label": "Use Custom Logo?"
-      },
-      {
-        "type": "image",
-        "id": "logo.png",
-        "label": "Custom Logo",
-        "max-width": 1200,
-        "max-height": 1200
-      },
-      {
-        "type": "paragraph",
-        "content": "Recommend the optimal width and height for your logo here."
-      }
-    ]
-  },
-  {
-    "name": "Homepage",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Content"
-      },
-      {
-        "type": "page",
-        "id": "homepage_page",
-        "label": "Show content of this page"
-      },
-      {
-        "type": "header",
-        "content": "Featured collection"
-      },
-      {
-        "type": "collection",
-        "id": "homepage_collection",
-        "label": "Feature products from this collection"
-      }
-    ]
-  },
-  {
     "name": "Collection pages",
     "settings": [
       {
