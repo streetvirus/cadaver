@@ -1,42 +1,49 @@
-{% if template contains 'product' %}
-  <meta property="og:type" content="product" />
-  <meta property="og:title" content="{{ product.title | strip_html | escape }}" />
-  <meta property="og:category" content="{{ product.type }}" />
-  {% for image in product.images %}
-  <meta property="og:image" content="http:{{ image | img_url: 'grande' }}" />
-  <meta property="og:image:secure_url" content="https:{{ image | img_url: 'grande' }}" />
+{% if template.name == 'index' %}
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ page_title }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+{% elsif template.name == 'product' %}
+  <meta property="og:type" content="product">
+  <meta property="og:title" content="{{ product.title | strip_html | escape }}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  {% for image in product.images reversed limit:3 %}
+  <meta property="og:image" content="http:{{ image.src | img_url: 'grande' }}">
+  <meta property="og:image:secure_url" content="https:{{ image.src | img_url: 'grande' }}">
   {% endfor %}
-  <meta property="og:price:amount" content="{{ product.price | money_without_currency }}" />
-  <meta property="og:price:currency" content="{{ shop.currency }}" />
-  <meta property="og:availability" content="{% if product.available %}instock{% else %}oos{% endif %}" />
-  <meta property="og:description" content="{{ product.description | strip_newlines | strip_html | truncate: 300 | escape }}">
-{% elsif template contains 'article' %}
+  <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html | escape }}">
+  <meta property="og:price:currency" content="{{ shop.currency }}">
+{% elsif template.name == 'article' %}
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="{{ article.title | strip_html | escape }}" />  
-  {% assign img_tag = '<' | append: 'img' %}
-  {% if article.content contains img_tag %}
-    {% assign src = article.content | split: 'src="' %}
-    {% assign src = src[1] | split: '"' | first | remove: 'https:' | remove: 'http:' %}
-    {% if src %}
-      <meta property="og:image" content="http:{{ src }}" />
-      <meta property="og:image:secure_url" content="https:{{ src }}" />
+  <meta property="og:title" content="{{ article.title | strip_html | escape }}" />
+  <meta property="og:url" content="{{ canonical_url }}">
+  {% if article.image %}
+    <meta property="og:image" content="http:{{ article | img_url: '1024x1024' }}">
+    <meta property="og:image:secure_url" content="https:{{ article | img_url: '1024x1024' }}">
+  {% else %}
+    {% assign img_tag = '<' | append: 'img' %}
+    {% if article.content contains img_tag %}
+      {% assign src = article.content | split: 'src="' %}
+      {% assign src = src[1] | split: '"' | first | remove: 'https:' | remove: 'http:' %}
+      {% if src %}
+        <meta property="og:image" content="http:{{ src }}" />
+        <meta property="og:image:secure_url" content="https:{{ src }}" />
+      {% endif %}
     {% endif %}
   {% endif %}
+{% elsif template.name == 'password' %}
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ shop.name }}">
+  <meta property="og:url" content="{{ shop.url }}">
 {% else %}
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="{{ page_title | escape }}" />
-  {% if settings.use_logo %}
-    <meta property="og:image" content="http:{{ 'logo.png' | asset_url }}" />
-    <meta property="og:image:secure_url" content="https:{{ 'logo.png' | asset_url }}" />
-  {% endif %}  
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ page_title }}">
+  <meta property="og:url" content="{{ canonical_url }}">
 {% endif %}
 
 {% if page_description and template != 'product' %}
 <meta property="og:description" content="{{ page_description }}" />
 {% endif %}
-
-<meta property="og:url" content="{{ canonical_url }}" />
-<meta property="og:site_name" content="{{ shop.name }}" />
+<meta property="og:site_name" content="{{ shop.name }}">
 
 {% comment %}
 // Put your sharing images in here

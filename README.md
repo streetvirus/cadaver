@@ -82,7 +82,7 @@ The site currently uses the Font Awesome font icon library.  To keep the CSS fil
 
 ##### Open Graph Images
 
-All open graph tags are contained in the snippet ``open-graph-tags.liquid``.  OG images are generated from the store logo, product page images or blog images.  To add default share images, generate them following the [best practice guidelines](https://developers.facebook.com/docs/sharing/best-practices#images) and hard code them in the snippet.
+All open graph tags are contained in the snippet ``open-graph-tags.liquid``.  OG images are generated from the store logo, product page images or blog images.  To add default share images, generate them following the [best practice guidelines](https://developers.facebook.com/docs/sharing/best-practices#images) and either hard code them in the snippet, or create theme settings for them.
 
 ##### Sections
 
