@@ -8,6 +8,13 @@
   {% if section.settings.test_text != blank %}
     Text: {{ section.settings.test_text }}
   {% endif %}
+
+  {% for block in section.blocks %}
+    <h4>Quote #{{ forloop.index }}</h4>
+    <blockquote {{ block.shopify_attributes }}>
+      {{ block.settings.quote }}
+    </blockquote>
+  {% endfor %}
 </div>
 
 {% schema %}
@@ -18,6 +25,19 @@
         "type": "text",
         "id": "test_text",
         "label": "Text to put in this section"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "boilerplate_quote",
+        "name": "Boilerplate Quote",
+        "settings": [
+          {
+            "id": "quote",
+            "type": "text",
+            "label": "Quote"
+          }
+        ]
       }
     ],
     "presets": [

@@ -18,7 +18,7 @@
    *
    * Borrowed from Slate.  This code is needed to register Shopify theme sections in order to interact with the theme editor
    */
-  SectionManager = function() {
+  var SectionManager = function() {
     this.constructors = {};
     this.instances = [];
 
@@ -45,17 +45,22 @@
 
       var instance = new constructor(container);
 
-      instance.id = id;
-      instance.type = type;
+      instance.id        = id;
+      instance.type      = type;
       instance.container = container;
 
       this.instances.push(instance);
     },
 
     _getInstanceById: function(id){
-      _.find(this.instances, function(instance) {
-        return instance.id === id;
-      });
+  
+      for (var i = this.instances.length - 1; i >= 0; i--) {
+        var instance = this.instances[i];
+        if(instance.id === id){
+          return instance;
+        }
+      }
+
     },
 
     _onSectionLoad: function(evt) {
@@ -67,22 +72,17 @@
 
     _onSectionUnload: function(evt) {
 
-      var instances = [];
-
-      $.each(this.instances, function(i, instance) {
+      for (var i = this.instances.length - 1; i >= 0; i--) {
+        var instance = this.instances[i];
 
         if(instance.id === evt.detail.sectionId){
           if(typeof instance.onUnload == "function"){
             instance.onUnload(evt);
           }
-        }
-        else {
-          instances.push(instance);
-        }
 
-      });
-
-      this.instances = instances;
+          this.instances.splice(i, 1); // remove the instance from our cache
+        }
+      }
 
     },
 
@@ -134,7 +134,7 @@
   Header.prototype = {
     init: function(){
       console.log('Header is initialized!');
-     return this;
+      return this;
     },
     onSelect: function(){
       console.log('Header onSelect');
@@ -151,25 +151,39 @@
     this.init();
   };
 
-  Footer.prototype.init = function(){
-    console.log('Footer is initialized!');
-    return this;
-  };
+  Footer.prototype.init = function(){};
 
-  var Boilerplate = function(){
+  // Different patterns you can use to create sections
+  // You *must* return the constructor
 
-  };
-
-  Boilerplate.prototype = {
-    onLoad: function(){
-      console.log('Boilerplate onLoad');
-    },
-    onUnload: function(){
-      console.log('Boilerplate onUnload');
+  var BoilerplateSection = (function() {
+    function BoilerplateSection() {
+      this.init();
     }
-  };
+    
+    BoilerplateSection.prototype = {
+      init: function() {},
+      onLoad: function(){
+        console.log('Boilerplate onLoad');
+      },
+      onUnload: function(){
+        console.log('Boilerplate onUnload');
+      }
+    };
+    
+    return BoilerplateSection;
+  })();
 
+  // DOM Ready
   $(function(){
+
+    /* Initialize sections */
+    /*==========================*/
+    window.sectionManager = new SectionManager();
+
+    sectionManager.register('header-section', Header);
+    sectionManager.register('footer-section', Footer);
+    sectionManager.register('boilerplate-section', BoilerplateSection);
 
     /* Remove SVG images to avoid broken images in all browsers that don't support SVG. */
     /*==========================*/
@@ -179,19 +193,24 @@
     
     /* Prepare to have floated images fill the width of the design on blog pages on small devices. */
     /*==========================*/ 
-    var images = $('.article img').load(function() {
-      var src = $(this).attr('src').replace(/_grande\.|_large\.|_medium\.|_small\./, '.');
-      var width = $(this).width();
-      $(this).attr('src', src).attr('width', width).removeAttr('height');
-    });
+    (function(){
+      $('.article img').load(function() {
+        var src = $(this).attr('src').replace(/_grande\.|_large\.|_medium\.|_small\./, '.');
+        var width = $(this).width();
+        $(this).attr('src', src).attr('width', width).removeAttr('height');
+      });
+    })();
 
-    // Create a section manager
-    var sectionManager = new SectionManager();
-
-    // Then register each section
-    sectionManager.register('header-section', Header);
-    sectionManager.register('footer-section', Footer);
-    sectionManager.register('boilerplate-section', Boilerplate);
+    /* Fix external links by opening them in a new window */
+    /*==========================*/
+    (function(){
+      $('a').not('[href*="mailto:"]').each(function () {
+        var isInternalLink = new RegExp('/' + window.location.host + '/');
+        if ( !isInternalLink.test(this.href) ) {
+          $(this).attr('target', '_blank');
+        }
+      });
+    })();
   });
 
 })(jQuery, Modernizr);
