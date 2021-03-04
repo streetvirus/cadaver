@@ -1,0 +1,41 @@
+{%- comment %}
+
+  Product Detail Form Gallery
+  ------------------------------------------------------------------------------
+
+  {% include 'product-detail-form-gallery',
+              product: { product } - required
+  %}
+
+{% endcomment -%}
+
+{% assign photo_main_dimension = '2000x' %}
+
+<div class="product-gallery" data-gallery>
+  <ul class="product-gallery__list">
+    {% for image in product.images %}
+      {% assign srcset = '' %}
+      {% assign widths = '250, 440, 720, 930, 1080, 1200, 1400, 1600, 1800' | split: ', ' %}
+
+      {% for width in widths %}
+        {% assign image_size = width | append: 'x' %}
+        {% capture srcset_size %}{{ image.src | img_url: image_size }} {{ width | append: 'w' }}{% unless forloop.last %},{% endunless %}{% endcapture %}
+        {% assign srcset = srcset | append: srcset_size %}
+      {% endfor %}
+      {% assign srcset = srcset | strip %}
+
+      <li
+        class="product-gallery__item"
+        data-image="{{ image.id }}"
+        data-gallery-item
+      >
+        <img
+          src="{{ image | img_url: photo_main_dimension }}"
+          srcset="{{ srcset }}"
+          alt="{{ mage.alt | escape }}"
+          class="product-gallery__image"
+        >
+      </li>
+    {% endfor %}
+  </ul>
+</div>

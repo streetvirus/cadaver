@@ -1,0 +1,87 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "extends": [
+    "airbnb-base"
+  ],
+  "parserOptions": {
+     "ecmaVersion": 6,
+     "sourceType": "module",
+     "ecmaFeatures": {
+       "forOf": true,
+       "es6": true,
+       "experimentalObjectRestSpread" : true
+    }
+  },
+  "globals": {
+    "Modernizr": "readonly",
+    "theme": "readonly",
+    "$": "readonly",
+    "jQuery": "readonly",
+    "Handlebars": "readonly"
+  },
+  "rules": {
+    "comma-dangle": "off",
+    "no-useless-constructor": "off",
+    "class-methods-use-this": "off",
+    "default-case": "off",
+    "no-unused-vars": ["warn", {
+      "args": "none"
+    }],
+    "no-underscore-dangle": "off",
+    "no-plusplus": "off",
+    "no-trailing-spaces": ["warn", {
+      "ignoreComments": true,
+      "skipBlankLines": true
+    }],
+    "eol-last": "warn",
+    "no-multi-spaces": "off",
+    "key-spacing": ["error", {
+      "afterColon": true,
+      "mode": "minimum"
+    }],
+    "brace-style": ["warn", "stroustrup"],
+    "space-before-function-paren": ["warn", {
+      "named": "never",
+      "anonymous": "never" 
+    }],
+    "max-len": ["error", {
+      "code": 200
+    }],
+    "radix": "off",
+    "prefer-destructuring": "off",
+    "prefer-template": "off",
+    "func-names": "off",
+    "no-prototype-builtins": "off",
+    "space-infix-ops": "off",
+    "no-param-reassign": "off",
+    "quote-props": ["warn", "consistent-as-needed"],
+    "comma-spacing": "warn",
+    "no-useless-escape": "off",
+    "no-console": ["warn", {
+      allow: ["warn", "error"]
+    }],
+    "arrow-body-style": "off",
+    "arrow-parens": [0, "as-needed"],
+    "no-unused-expressions": ["error", {
+      "allowShortCircuit": true,
+      "allowTernary": true
+    }],
+    "object-shorthand": ["error", "consistent-as-needed"],
+    "operator-linebreak": ["error", "after"],
+    "no-new": "off",
+    "no-alert": "off",
+    "indent": "off",
+    "semi": ["warn"],
+    "space-in-parens": ["warn"],
+    "object-curly-newline": "off",
+    "quotes": ["warn"],
+    "one-var": "warn",
+    "vars-on-top": "warn",
+    "import/prefer-default-export": "off",
+    "prefer-arrow-callback": "warn"
+  }
+}

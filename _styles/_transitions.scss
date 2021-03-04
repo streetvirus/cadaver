@@ -1,0 +1,26 @@
+.view-content {
+  transform-origin: top;
+  opacity: 1;
+
+  &.transition-in {
+    position: fixed;
+    // position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    height: 100vh;
+    width: 100%;
+    opacity: 0;
+    z-index: 1;
+
+    &.transition-in-active {
+      opacity: 1;
+      transition: opacity 0.3s cubic-bezier(0.32, 0.09, 0.34, 0.96);
+    }
+  }
+
+  &.transition-out {
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.3, 0.46, 0.17, 0.9);
+  }
+}

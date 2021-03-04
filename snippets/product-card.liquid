@@ -1,0 +1,59 @@
+{%- comment %}
+
+  Product Card
+  ------------------------------------------------------------------------------
+
+  Usage:
+
+  {% render 'product-card',
+             product: { product } - required
+  %}
+
+{% endcomment -%}
+
+{% assign product_image_dimension = '600x' %}
+
+{% assign sold_out = false %}
+{% if product.available == false %}
+  {% assign sold_out = true %}
+{% endif %}
+
+{% if product %}
+  <div class="product-card{% if sold_out %} product-card--sold-out{% endif %}" data-product-card>
+    <div class="product-card__contents">
+      {% if product.featured_image %}
+        <a href="{{ product.url }}">
+          <div class="product-card__gallery">
+            <div class="product-card__gallery-image" data-product-card-gallery>
+              <img
+                src="{{ product.featured_image.src | img_url: product_image_dimension }}"
+                alt="{{ product.featured_image.alt | escape }}"
+              >
+            </div>
+          </div>
+        </a>
+      {% endif %}
+
+      <div class="product-card__info">
+        <p class="product-card__info-title">{{ product.title }}</p>
+        <p class="product-card__info-price">
+          {% if product.available %}
+            {% if product.compare_at_price > product.price %}
+              <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+              <s>{{ product.compare_at_price | money_without_trailing_zeros }}</s>
+            {% endif %}
+
+            {% if product.price_varies %}
+              {%- assign price = product.price | money -%}
+              {{ 'products.product.from_text_html' | t: price: price }}
+            {% else %}
+              {{ product.price | money_without_trailing_zeros }}
+            {% endif %}
+          {% else %}
+            Sold Out
+          {% endif %}
+        </p>
+      </div>      
+    </div>
+  </div>
+{% endif %}

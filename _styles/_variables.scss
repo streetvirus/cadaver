@@ -1,0 +1,51 @@
+/* Color */
+
+$black: #000;
+$white: #FFF;
+
+$body-bg:    $white;
+$color-text: $black;
+
+
+/* Typography */
+
+$font-family-base: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+$font-weight-thin:        100;
+$font-weight-extra-light: 200;
+$font-weight-light:       300;
+$font-weight-normal:      400;
+$font-weight-medium:      500;
+$font-weight-semi-bold:   600;
+$font-weight-bold:        700;
+$font-weight-extra-bold:  800;
+$font-weight-black:       900;
+
+$font-size-base:    1rem;
+$font-size-small:   $font-size-base * 0.85;
+$font-size-smaller: $font-size-base * 0.8;
+$font-size-tiny:    $font-size-base * 0.75;
+
+$line-height-base:    1.3;
+$line-height-small:   1.4;
+$line-height-smaller: 1.4;
+$line-height-tiny:    1.5;
+
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1200px,
+  xxl: 1480px,
+  xxxl: 1800px
+);
+
+$gutter: 32px;
+$content-max-width: 1400px;
+
+// Component Sizing
+$zindex-ajax-cart: 50;
+$zindex-header: 100;
+$zindex-skip-to-content: 10000;
+

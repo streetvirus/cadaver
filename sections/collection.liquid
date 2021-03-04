@@ -1,0 +1,37 @@
+{%- comment %}
+
+  Collection Section
+  ------------------------------------------------------------------------------
+
+{% endcomment -%}
+
+{% paginate collection.products by 500 %}
+
+<div data-section-id="{{ section.id }}" data-section-type="collection">
+  <div class="container">
+
+    {% if collection.products.size > 0 %}   
+      <div class="content-grid">
+        {% for product in collection.products %}
+          <div class="content-grid__item">
+            {% include 'product-card',
+                        product: product
+            %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Nothing Found..</p>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endpaginate %}
+
+{% schema %}
+  {
+    "name": "Collection",
+    "settings": []
+  }
+{% endschema %}

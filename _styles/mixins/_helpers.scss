@@ -1,0 +1,45 @@
+@mixin visually-hidden() {
+  // sass-lint:disable no-important
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+@mixin visually-shown($position: inherit) {
+  // sass-lint:disable no-important
+  position: $position !important;
+  overflow: auto;
+  clip: auto;
+  width: auto;
+  height: auto;
+  margin: 0;
+}
+
+@mixin fill($position: absolute) {
+  position: $position;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+}
+
+@mixin font-face($font-family, $file-name, $font-weight: normal, $font-style: normal) {
+  @font-face {
+    font-family: $font-family;
+      src: url("{{ \'#{$file-name}.woff\' | asset_url }}") format('woff'),
+           url("{{ \'#{$file-name}.woff2\' | asset_url }}") format('woff2');
+    font-weight: $font-weight;
+    font-style: $font-style;
+  }
+}
+
+@mixin has-hover {
+  @media (hover: hover) {
+    @content
+  }
+}

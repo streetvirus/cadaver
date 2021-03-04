@@ -1,0 +1,14 @@
+@mixin text-small {
+  font-size: $font-size-small;
+  line-height: $line-height-small;
+}
+
+@mixin text-smaller {
+  font-size: $font-size-smaller;
+  line-height: $line-height-smaller;
+}
+
+@mixin text-tiny {
+  font-size: $font-size-tiny;
+  line-height: $line-height-tiny;
+}

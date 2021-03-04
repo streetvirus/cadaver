@@ -1,33 +1,12 @@
-<footer data-section-id="{{ section.id }}" data-section-type="footer-section">
+<footer data-section-id="{{ section.id }}" data-section-type="footer">
   <div class="container">
-    <div class="row">
-      {% if linklists.footer.links.size > 0 %}
-      <p role="navigation">
-      {% for link in linklists.footer.links %}
-        <a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a>
-      {% endfor %}
-      </p>
-      {% endif %}
-      
-      <p role="contentinfo">
-        {% if section.settings.show_copyright %}
-          Copyright &copy; {{ "now" | date: "%Y" }}
-        {% endif %}
-        {{ shop.name }}
-      </p>
-    </div>
+    Footer
   </div>
 </footer>
 
 {% schema %}
   {
     "name": "Footer",
-    "settings": [
-      {
-        "type": "checkbox",
-        "id": "show_copyright",
-        "label": "Show copyright date"
-      }
-    ]
+    "settings": []
   }
 {% endschema %}

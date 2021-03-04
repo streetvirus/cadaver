@@ -1,0 +1,21 @@
+.btn {
+  display: inline-block;
+  margin-top: 12px;
+  background: none;
+  text-transform: uppercase;
+  border: 1px solid #000;
+  border-radius: 0px;
+  padding: 12px 17px;
+  font-size: 12px;
+  width: auto;
+  cursor: pointer;
+  font-family: Arial;
+
+  &.disabled {
+    border: 1px solid #ccc;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}

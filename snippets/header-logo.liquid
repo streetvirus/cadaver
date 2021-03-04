@@ -1,0 +1,11 @@
+{% if template.name == 'index' %}
+  <h1 itemscope itemtype="http://schema.org/Organization" style="display: none !important;">{{ shop.name }}</h1>
+{% else %}
+  <div class="h1" itemscope itemtype="http://schema.org/Organization" style="display: none !important;">{{ shop.name }}</div>
+{% endif %}
+
+<div class="header-logo">
+  <!-- {% include 'icon-logo' %} -->
+  Logo icon / Image here
+  <span class="visually-hidden">{{ shop.name }} logo</span>
+</div>
