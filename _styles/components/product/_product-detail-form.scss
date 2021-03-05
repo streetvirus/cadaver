@@ -1,0 +1,22 @@
+.product-detail-form {
+  > .container {
+    display: flex;
+
+    > div {
+      flex: 1;
+      padding: 0 $gutter/2;
+    }
+  }
+}
+
+.option-value-list {
+
+}
+
+.option-value {
+  margin-right: 10px;
+
+  &.is-active {
+    border-bottom: 1px solid black;
+  }
+}

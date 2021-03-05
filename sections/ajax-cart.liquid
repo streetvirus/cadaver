@@ -1,0 +1,87 @@
+<div data-section-id="{{ section.id }}" data-section-type="ajax-cart">
+  <div class="ajax-cart" data-ajax-cart>
+    <form action="/cart" method="post" class="ajax-cart-form" novalidate>
+      <div class="layout-content-wrapper">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-7 col-lg-8">
+              <div class="ajax-cart__body" data-ajax-cart-body>
+                {% comment %} Filled in via JS {% endcomment %}
+              </div>              
+            </div>
+            <div class="col-5 offset-5 col-md-3 offset-md-0 col-lg-2">
+              <div class="ajax-cart__footer" data-ajax-cart-footer>
+                <div class="ajax-cart__footer-top">                 
+                  <div class="ajax-cart__footer-row">
+                    Sub total: <span data-ajax-cart-total-price></span>
+                  </div>
+                </div>
+                <div class="ajax-cart__footer-bottom">
+                  <div class="ajax-cart__footer-row">
+                    <button type="submit" name="checkout" class="btn btn-alt">
+                      {{ 'cart.general.proceed_to_checkout' | t }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>     
+    </form>
+
+    <div class="ajax-cart__empty-message">
+      {% if section.settings.empty_text != blank %}
+        {{ section.settings.empty_text }}
+      {% else %}
+        <p>{{ 'cart.general.empty' | t }}</p>
+      {% endif %}
+      <a href="/" class="btn btn-alt" data-ajax-cart-close>Return to Shop</a>
+    </div>    
+  </div>
+</div>
+
+{% raw %}
+  <script type="text/x-handlebars-template" data-ajax-cart-body-template>
+    {{#if items}}
+      <div class="row">
+        {{#each items}}
+          <div class="ajax-cart__item col-md-5" data-key="{{ key }}" data-qty="{{ quantity }}" data-ajax-item>
+            <div class="ajax-cart__item-child">
+              <img src="{{ image }}" class="ajax-cart__item-image">
+            </div>
+            <div class="ajax-cart__item-child">
+              <div class="ajax-cart__item-info">
+                <h3>{{ product_title }}</h3>
+                <div>{{ price }}</div>
+                {{#if sku}}
+                  <div>{{ sku }}</div>
+                {{/if}}
+                <div>{{ variant_title }}</div>
+                {{#if multiple_quantities}}
+                <div>QTY {{ quantity }}</div>
+                {{/if}}
+                <a href="#" class="btn btn-alt" data-ajax-cart-item-remove>Remove</a>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{/if}}
+  </script>
+{% endraw %}
+
+
+{% schema %}
+  {
+    "name": "Ajax Cart",
+    "settings": [
+      {
+        "id": "empty_text",
+        "type": "richtext",
+        "label": "Empty Text",
+        "default": "<p>Cart Empty</p>"
+      }
+    ]
+  }
+{% endschema %}

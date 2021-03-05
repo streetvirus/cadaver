@@ -19,6 +19,7 @@ import IndexView from './views/index'
 // Sections
 import SectionManager from './core/sectionManager'
 import Header from './sections/header'
+import AJAXCart from './sections/ajaxCart'
 
 const setViewportHeightProperty = () => {
   // If mobile / tablet, set var to window height. This fixes the 100vh iOS bug/feature.
@@ -32,6 +33,7 @@ const setViewportHeightProperty = () => {
   const sectionManager = new SectionManager()
 
   sectionManager.register('header', Header)
+  sectionManager.register('ajax-cart', AJAXCart)
 
   const appController = new AppController({
     viewConstructors: {

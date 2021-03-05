@@ -45,7 +45,11 @@
       document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
       
       window.theme = {
-        strings: {},
+        strings: {
+          addToCart: 'Add To Cart',
+          soldOut: 'Sold Out',
+          unavailable: 'Unavailable'
+        },
         moneyFormat: {{ shop.money_format | json }}
       };
     </script>
@@ -95,5 +99,7 @@
         {% section 'footer' %}
       </div>
     </div>
+
+    {% section 'ajax-cart' %}
   </body>
 </html>

@@ -6,6 +6,61 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _cartAPI = _interopRequireDefault(require("../core/cartAPI"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var AJAXCart = /*#__PURE__*/function () {
+  function AJAXCart(el) {
+    _classCallCheck(this, AJAXCart);
+
+    console.log('creating ajax cart...');
+    this.$el = (0, _jquery.default)(el);
+  }
+
+  _createClass(AJAXCart, [{
+    key: "render",
+    value: function render(cart) {
+      console.log(cart);
+    }
+  }, {
+    key: "open",
+    value: function open() {
+      console.log('open!');
+    }
+  }, {
+    key: "onChangeSuccess",
+    value: function onChangeSuccess() {
+      console.log('onChangeSuccess');
+    }
+  }, {
+    key: "onChangeFail",
+    value: function onChangeFail() {
+      console.log('onChangeFail');
+    }
+  }]);
+
+  return AJAXCart;
+}();
+
+exports.default = AJAXCart;
+
+},{"../core/cartAPI":10,"jquery":26}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var ProductCard = function ProductCard() {
@@ -16,7 +71,7 @@ var ProductCard = function ProductCard() {
 
 exports.default = ProductCard;
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24,17 +79,180 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _ajaxFormManager = require("../../core/ajaxFormManager");
+
+var _variants = _interopRequireDefault(require("./variants"));
+
+var _productDetailPrice = _interopRequireDefault(require("./productDetailPrice"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ProductDetailForm = function ProductDetailForm() {
-  _classCallCheck(this, ProductDetailForm);
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-  console.log('new product detail form');
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var selectors = {
+  form: 'form[data-add-to-cart-form]',
+  productJSON: '[data-product-json]',
+  singleOptionSelector: '[data-single-option-selector]',
+  originalSelectorId: '[data-product-select]',
+  variantOptionValueList: '[data-variant-option-value-list][data-option-position]',
+  variantOptionValue: '[data-variant-option-value]',
+  productDetailPrice: '[data-product-detail-price]',
+  addToCartBtn: '[data-add-to-cart-btn]',
+  addToCartText: '[data-add-to-cart-text]'
 };
+var classes = {
+  variantOptionValueActive: 'is-active'
+};
+var $window = (0, _jquery.default)(window);
+
+var ProductDetailForm = /*#__PURE__*/function () {
+  /**
+   * ProductDetailForm constructor
+   *
+   * @param { HTMLElement } el
+   * @param { Object } options
+   * @param { Function } config.onVariantChange -  Called when a new variant has been selected from the form,
+   * @param { Boolean } config.enableHistoryState - If set to "true", turns on URL updating when switching variant
+   */
+  function ProductDetailForm(el, options) {
+    _classCallCheck(this, ProductDetailForm);
+
+    var defaults = {
+      onVariantChange: function onVariantChange() {},
+      enableHistoryState: true
+    };
+    this.settings = _jquery.default.extend({}, defaults, options);
+    this.$el = (0, _jquery.default)(el);
+    this.$form = (0, _jquery.default)(selectors.form, this.$el);
+    this.$singleOptionSelectors = (0, _jquery.default)(selectors.singleOptionSelector, this.$el);
+    this.$variantOptionValueList = (0, _jquery.default)(selectors.variantOptionValueList, this.$el); // Alternate UI that takes the place of a single option selector (could be swatches, dots, buttons, whatever..)    
+
+    this.$productDetailPrice = (0, _jquery.default)(selectors.productDetailPrice, this.$el);
+    this.$addToCartBtn = (0, _jquery.default)(selectors.addToCartBtn, this.$container);
+    this.$addToCartBtnText = (0, _jquery.default)(selectors.addToCartText, this.$container); // Text inside the add to cart button
+
+    this.defaultButtonText = this.$addToCartBtnText.text();
+    this.product = JSON.parse((0, _jquery.default)(selectors.productJSON, this.$el).html());
+    this.variants = new _variants.default({
+      $container: this.$el,
+      enableHistoryState: this.settings.enableHistoryState,
+      singleOptionSelector: selectors.singleOptionSelector,
+      originalSelectorId: selectors.originalSelectorId,
+      product: this.product
+    });
+    this.price = new _productDetailPrice.default(this.$productDetailPrice);
+    this.$el.on('variantChange', this.onVariantChange.bind(this));
+    this.$el.on('click', selectors.variantOptionValue, this.onVariantOptionValueClick.bind(this));
+    $window.on(_ajaxFormManager.events.ADD_START, this.onAddStart.bind(this));
+    $window.on(_ajaxFormManager.events.ADD_DONE, this.onAddDone.bind(this));
+  }
+  /**
+   * Updates the DOM state of the elements matching the variantOption Value selector based on the currently selected variant
+   *
+   * @param {Object} variant - Shopify variant object
+   */
+
+
+  _createClass(ProductDetailForm, [{
+    key: "updateVariantOptionValues",
+    value: function updateVariantOptionValues(variant) {
+      if (variant) {
+        // Loop through all the options and update the option value
+        for (var i = 1; i <= 3; i++) {
+          var variantOptionValue = variant["option".concat(i)];
+          if (!variantOptionValue) break; // Break if the product doesn't have an option at this index
+          // Since we are finding the variantOptionValueUI based on the *actual* value, we need to scope to the correct list
+          // As some products can have the same values for different variant options (waist + inseam both use "32", "34", etc..)
+
+          var $list = this.$variantOptionValueList.filter("[data-option-position=\"".concat(i, "\"]"));
+          var $variantOptionValueUI = $list.find('[data-variant-option-value="' + variantOptionValue + '"]');
+          $variantOptionValueUI.addClass(classes.variantOptionValueActive);
+          $variantOptionValueUI.siblings().removeClass(classes.variantOptionValueActive);
+        }
+      }
+    }
+    /**
+     * Updates the DOM state of the add to cart button
+     *
+     * @param {Object} variant - Shopify variant object
+     */
+
+  }, {
+    key: "updateAddToCartState",
+    value: function updateAddToCartState(variant) {
+      var btnText = '';
+      var btnDisabled = false;
+
+      if (variant) {
+        if (variant.available) {
+          btnDisabled = false;
+          btnText = theme.strings.addToCart;
+        } else {
+          btnDisabled = true;
+          btnText = theme.strings.soldOut;
+        }
+      } else {
+        btnDisabled = true;
+        btnText = theme.strings.unavailable;
+      }
+
+      this.$addToCartBtn.prop('disabled', btnDisabled);
+      this.$addToCartBtnText.text(btnText);
+    }
+  }, {
+    key: "onVariantChange",
+    value: function onVariantChange(_ref) {
+      var variant = _ref.variant;
+      this.updateVariantOptionValues(variant);
+      this.updateAddToCartState(variant);
+      this.price.update(variant);
+      this.settings.onVariantChange(variant);
+    }
+  }, {
+    key: "onVariantOptionValueClick",
+    value: function onVariantOptionValueClick(e) {
+      e.preventDefault();
+      var $option = (0, _jquery.default)(e.currentTarget);
+
+      if ($option.hasClass(classes.variantOptionValueActive) || $option.hasClass('is-disabled')) {
+        return;
+      }
+
+      var value = $option.data('variant-option-value');
+      var position = $option.parents(selectors.variantOptionValueList).data('option-position');
+      var $selector = this.$singleOptionSelectors.filter("[data-index=\"option".concat(position, "\"]"));
+      $selector.val(value).trigger('change');
+      $option.addClass(classes.variantOptionValueActive);
+      $option.siblings().removeClass(classes.variantOptionValueActive);
+    }
+  }, {
+    key: "onAddStart",
+    value: function onAddStart(_ref2) {
+      var relatedTarget = _ref2.relatedTarget;
+      if (!this.$form.is(relatedTarget)) return;
+      this.$addToCartBtnText.text('Adding...');
+    }
+  }, {
+    key: "onAddDone",
+    value: function onAddDone(_ref3) {
+      var relatedTarget = _ref3.relatedTarget;
+      if (!this.$form.is(relatedTarget)) return;
+      this.$addToCartBtnText.text(this.defaultButtonText);
+    }
+  }]);
+
+  return ProductDetailForm;
+}();
 
 exports.default = ProductDetailForm;
 
-},{}],3:[function(require,module,exports){
+},{"../../core/ajaxFormManager":8,"./productDetailPrice":5,"./variants":6,"jquery":26}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -52,7 +270,293 @@ var ProductDetailGallery = function ProductDetailGallery() {
 
 exports.default = ProductDetailGallery;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _currency = require("../../core/currency");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var selectors = {
+  price: '[data-price]',
+  compareText: '[data-compare-text]',
+  comparePrice: '[data-compare-price]'
+};
+
+var ProductDetailPrice = /*#__PURE__*/function () {
+  function ProductDetailPrice(el) {
+    _classCallCheck(this, ProductDetailPrice);
+
+    this.$el = (0, _jquery.default)(el);
+    this.$price = (0, _jquery.default)(selectors.price, this.$el);
+    this.$compareText = (0, _jquery.default)(selectors.compareText, this.$el);
+    this.$comparePrice = (0, _jquery.default)(selectors.comparePrice, this.$el);
+    this.$compareEls = this.$comparePrice.add(this.$compareText);
+  }
+
+  _createClass(ProductDetailPrice, [{
+    key: "update",
+    value: function update(variant) {
+      if (variant) {
+        var price = (0, _currency.stripZeroCents)((0, _currency.formatMoney)(variant.price));
+        var comparePrice = (0, _currency.stripZeroCents)((0, _currency.formatMoney)(variant.compare_at_price));
+        this.$price.html(price);
+
+        if (variant.compare_at_price > variant.price) {
+          this.$comparePrice.html(comparePrice);
+          this.$compareEls.show();
+        } else {
+          this.$comparePrice.html('');
+          this.$compareEls.hide();
+        }
+
+        this.$el.show();
+      } else {
+        this.$el.hide();
+      }
+    }
+  }]);
+
+  return ProductDetailPrice;
+}();
+
+exports.default = ProductDetailPrice;
+
+},{"../../core/currency":11,"jquery":26}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _utils = require("../../core/utils");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/**
+ * Variant Selection scripts
+ * ------------------------------------------------------------------------------
+ *
+ * Handles change events from the variant inputs in any `cart/add` forms that may
+ * exist. Also updates the master select and triggers updates when the variants
+ * price or image changes.
+ *
+ */
+var Variants = /*#__PURE__*/function () {
+  /**
+   * Variant constructor
+   *
+   * @param {object} options - Settings from `product.js`
+   */
+  function Variants(options) {
+    _classCallCheck(this, Variants);
+
+    this.$container = options.$container;
+    this.product = options.product;
+    this.singleOptionSelector = options.singleOptionSelector;
+    this.originalSelectorId = options.originalSelectorId;
+    this.enableHistoryState = options.enableHistoryState;
+    this.currentVariant = this._getVariantFromOptions();
+    (0, _jquery.default)(this.singleOptionSelector, this.$container).on('change', this._onSelectChange.bind(this));
+  }
+  /**
+   * Get the currently selected options from add-to-cart form. Works with all
+   * form input elements.
+   *
+   * @return {array} options - Values of currently selected variants
+   */
+
+
+  _createClass(Variants, [{
+    key: "_getCurrentOptions",
+    value: function _getCurrentOptions() {
+      var currentOptions = _jquery.default.map((0, _jquery.default)(this.singleOptionSelector, this.$container), function (element) {
+        var $element = (0, _jquery.default)(element);
+        var type = $element.attr('type');
+        var currentOption = {};
+        /* eslint-disable */
+        // Shopify wrote this code...
+
+        if (type === 'radio' || type === 'checkbox') {
+          if ($element[0].checked) {
+            currentOption.value = $element.val();
+            currentOption.index = $element.data('index');
+            return currentOption;
+          } else {
+            return false;
+          }
+        } else {
+          currentOption.value = $element.val();
+          currentOption.index = $element.data('index');
+          return currentOption;
+        }
+        /* eslint-enable */
+
+      }); // remove any unchecked input values if using radio buttons or checkboxes
+
+
+      currentOptions = (0, _utils.compact)(currentOptions);
+      return currentOptions;
+    }
+    /**
+     * Find variant based on selected values.
+     *
+     * @param  {array} selectedValues - Values of variant inputs
+     * @return {object || undefined} found - Variant object from product.variants
+     */
+
+  }, {
+    key: "_getVariantFromOptions",
+    value: function _getVariantFromOptions() {
+      var selectedValues = this._getCurrentOptions();
+
+      var variants = this.product.variants;
+      var found = false;
+      variants.forEach(function (variant) {
+        var satisfied = true;
+        selectedValues.forEach(function (option) {
+          if (satisfied) {
+            satisfied = option.value === variant[option.index];
+          }
+        });
+
+        if (satisfied) {
+          found = variant;
+        }
+      });
+      return found || null;
+    }
+    /**
+     * Event handler for when a variant input changes.
+     */
+
+  }, {
+    key: "_onSelectChange",
+    value: function _onSelectChange() {
+      var variant = this._getVariantFromOptions();
+
+      this.$container.trigger({
+        type: 'variantChange',
+        variant: variant
+      });
+
+      if (!variant) {
+        return;
+      }
+
+      this._updateMasterSelect(variant);
+
+      this._updateImages(variant);
+
+      this._updatePrice(variant);
+
+      this.currentVariant = variant;
+
+      if (this.enableHistoryState) {
+        this._updateHistoryState(variant);
+      }
+    }
+    /**
+     * Trigger event when variant image changes
+     *
+     * @param  {object} variant - Currently selected variant
+     * @return {event}  variantImageChange
+     */
+
+  }, {
+    key: "_updateImages",
+    value: function _updateImages(variant) {
+      var variantImage = variant.featured_image || {};
+      var currentVariantImage = this.currentVariant.featured_image || {};
+
+      if (!variant.featured_image || variantImage.src === currentVariantImage.src) {
+        return;
+      }
+
+      this.$container.trigger({
+        type: 'variantImageChange',
+        variant: variant
+      });
+    }
+    /**
+     * Trigger event when variant price changes.
+     *
+     * @param  {object} variant - Currently selected variant
+     * @return {event} variantPriceChange
+     */
+
+  }, {
+    key: "_updatePrice",
+    value: function _updatePrice(variant) {
+      if (variant.price === this.currentVariant.price && variant.compare_at_price === this.currentVariant.compare_at_price) {
+        return;
+      }
+
+      this.$container.trigger({
+        type: 'variantPriceChange',
+        variant: variant
+      });
+    }
+    /**
+     * Update history state for product deeplinking
+     *
+     * @param  {variant} variant - Currently selected variant
+     * @return {k}         [description]
+     */
+
+  }, {
+    key: "_updateHistoryState",
+    value: function _updateHistoryState(variant) {
+      if (!window.history.replaceState || !variant) {
+        return;
+      }
+
+      var newurl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?variant=' + variant.id;
+      window.history.replaceState({
+        path: newurl
+      }, '', newurl);
+    }
+    /**
+     * Update hidden master select of variant change
+     *
+     * @param  {variant} variant - Currently selected variant
+     */
+
+  }, {
+    key: "_updateMasterSelect",
+    value: function _updateMasterSelect(variant) {
+      (0, _jquery.default)(this.originalSelectorId, this.$container)[0].value = variant.id;
+    }
+  }]);
+
+  return Variants;
+}();
+
+exports.default = Variants;
+
+},{"../../core/utils":14,"jquery":26}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -160,7 +664,88 @@ function removeTrapFocus(options) {
   (0, _jquery.default)(document).off(eventName);
 }
 
-},{"jquery":18}],5:[function(require,module,exports){
+},{"jquery":26}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.events = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _utils = require("./utils");
+
+var _cartAPI = require("./cartAPI");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var selectors = {
+  form: 'form[action^="/cart/add"]',
+  submit: '[type="submit"]'
+};
+var $window = (0, _jquery.default)(window);
+var $body = (0, _jquery.default)(document.body);
+var events = {
+  ADD_START: 'addStart.ajaxFormManager',
+  ADD_DONE: 'addDone.ajaxFormManager',
+  ADD_SUCCESS: 'addSuccess.ajaxFormManager',
+  ADD_FAIL: 'addFail.ajaxFormManager'
+};
+exports.events = events;
+
+var AJAXFormManager = function AJAXFormManager() {
+  _classCallCheck(this, AJAXFormManager);
+
+  var requestInProgress = false;
+  $body.on('submit', selectors.form, function (e) {
+    e.preventDefault();
+    if (requestInProgress) return;
+    var $form = (0, _jquery.default)(e.currentTarget);
+    var $submit = $form.find(selectors.submit);
+
+    var startEvent = _jquery.default.Event(events.ADD_START, {
+      relatedTarget: $form
+    });
+
+    $window.trigger(startEvent); // Disable the button so the user knows the form is being submitted
+
+    $submit.prop('disabled', true);
+    requestInProgress = true;
+    (0, _cartAPI.addItemFromForm)($form) // Always needs to go before then / fail because the window event callbacks can cause a change to the disabled state of the button
+    .always(function () {
+      $submit.prop('disabled', false);
+      requestInProgress = false;
+
+      var event = _jquery.default.Event(events.ADD_DONE, {
+        relatedTarget: $form
+      });
+
+      $window.trigger(event);
+    }).then(function (data) {
+      var event = _jquery.default.Event(events.ADD_SUCCESS, {
+        cart: data,
+        relatedTarget: $form
+      });
+
+      $window.trigger(event);
+    }).fail(function (data) {
+      var event = _jquery.default.Event(events.ADD_FAIL, {
+        message: data.message,
+        description: data.description,
+        relatedTarget: $form
+      });
+
+      $window.trigger(event);
+    });
+  });
+};
+
+exports.default = AJAXFormManager;
+
+},{"./cartAPI":10,"./utils":14,"jquery":26}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -458,7 +1043,318 @@ var AppController = /*#__PURE__*/function () {
 
 exports.default = AppController;
 
-},{"../views/base":13,"./utils":7,"jquery":18,"navigo":19}],6:[function(require,module,exports){
+},{"../views/base":21,"./utils":14,"jquery":26,"navigo":27}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addItemFromForm = exports.getCart = exports.formatCart = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _currency = require("./currency");
+
+var _image = require("./image");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Formats the cart object to be consumed by the handlebars template
+ *
+ * @param {object} cart - JSON representation of the cart.  See https://help.shopify.com/themes/development/getting-started/using-ajax-api#get-cart
+ * @return {object} 
+ */
+var formatCart = function formatCart(cart) {
+  if (cart && cart.is_formatted) {
+    return cart;
+  } // Make adjustments to the cart object contents before we pass it off to the handlebars template
+
+
+  cart.total_price = (0, _currency.formatMoney)(cart.total_price, theme.moneyFormat);
+  cart.items.map(function (item) {
+    item.image = (0, _image.getSizedImageUrl)(item.image, '500x');
+    item.price = (0, _currency.formatMoney)(item.price);
+    item.multiple_quantities = item.quantity > 1; // Adjust the item's variant options to add "name" and "value" properties
+
+    if (item.hasOwnProperty('product')) {
+      var product = item.product;
+
+      for (var i = item.variant_options.length - 1; i >= 0; i--) {
+        var name = product.options[i];
+        var value = item.variant_options[i];
+        item.variant_options[i] = {
+          name: name,
+          value: value
+        }; // Don't show this info if it's the default variant that Shopify creates
+
+        if (value === 'Default Title') {
+          delete item.variant_options[i];
+        }
+      }
+    } else {
+      delete item.variant_options; // skip it and use the variant title instead
+    }
+
+    if (item.variant_title === 'Default Title') {
+      item.variant_title = null;
+    }
+
+    return item;
+  });
+  cart.is_formatted = true;
+  return cart;
+};
+/**
+ * Retrieve a JSON respresentation of the users cart
+ *
+ * @return {Promise} - JSON cart
+ */
+
+
+exports.formatCart = formatCart;
+
+var getCart = function getCart() {
+  var promise = _jquery.default.Deferred();
+
+  _jquery.default.ajax({
+    type: 'get',
+    url: '/cart?view=json',
+    success: function success(data) {
+      // Theme editor adds HTML comments to JSON response, strip these
+      data = data.replace(/<\/?[^>]+>/gi, '');
+      var cart = JSON.parse(data);
+      promise.resolve(formatCart(cart));
+    },
+    error: function error() {
+      promise.reject({
+        message: 'Could not retrieve cart items'
+      });
+    }
+  });
+
+  return promise;
+};
+/**
+ * AJAX submit an 'add to cart' form
+ *
+ * @param {jQuery} $form - jQuery instance of the form
+ * @return {Promise} - Resolve returns JSON cart | Reject returns an error message
+ */
+
+
+exports.getCart = getCart;
+
+var addItemFromForm = function addItemFromForm($form) {
+  var promise = _jquery.default.Deferred();
+
+  _jquery.default.ajax({
+    type: 'post',
+    dataType: 'json',
+    url: '/cart/add.js',
+    data: $form.serialize(),
+    success: function success() {
+      getCart().then(function (cart) {
+        promise.resolve(cart);
+      });
+    },
+    error: function error() {
+      promise.reject({
+        message: 'The quantity you entered is not available.'
+      });
+    }
+  });
+
+  return promise;
+};
+
+exports.addItemFromForm = addItemFromForm;
+
+},{"./currency":11,"./image":12,"jquery":26}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.formatMoney = formatMoney;
+exports.stripZeroCents = stripZeroCents;
+
+/**
+ * Currency Helpers
+ * -----------------------------------------------------------------------------
+ * A collection of useful functions that help with currency formatting
+ *
+ * Current contents
+ * - formatMoney - Takes an amount in cents and returns it as a formatted dollar value.
+ *
+ */
+var moneyFormat = '${{amount}}'; // eslint-disable-line no-template-curly-in-string
+
+/**
+ * Format money values based on your shop currency settings
+ * @param  {Number|string} cents - value in cents or dollar amount e.g. 300 cents
+ * or 3.00 dollars
+ * @param  {String} format - shop money_format setting
+ * @return {String} value - formatted value
+ */
+
+function formatMoney(cents, format) {
+  if (typeof cents === 'string') {
+    cents = cents.replace('.', '');
+  }
+
+  var value = '';
+  var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+  var formatString = format || moneyFormat;
+
+  function formatWithDelimiters(number) {
+    var precision = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+    var thousands = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ',';
+    var decimal = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '.';
+
+    if (Number.isNaN(number) || number == null) {
+      return 0;
+    }
+
+    number = (number / 100.0).toFixed(precision);
+    var parts = number.split('.');
+    var dollarsAmount = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1".concat(thousands));
+    var centsAmount = parts[1] ? decimal + parts[1] : '';
+    return dollarsAmount + centsAmount;
+  }
+
+  switch (formatString.match(placeholderRegex)[1]) {
+    case 'amount':
+      value = formatWithDelimiters(cents, 2);
+      break;
+
+    case 'amount_no_decimals':
+      value = formatWithDelimiters(cents, 0);
+      break;
+
+    case 'amount_with_space_separator':
+      value = formatWithDelimiters(cents, 2, ' ', '.');
+      break;
+
+    case 'amount_no_decimals_with_comma_separator':
+      value = formatWithDelimiters(cents, 0, ',', '.');
+      break;
+
+    case 'amount_no_decimals_with_space_separator':
+      value = formatWithDelimiters(cents, 0, ' ');
+      break;
+  }
+
+  return formatString.replace(placeholderRegex, value);
+}
+/**
+ * Removes '.00' if found at the end of the string
+ *
+ * @param  {string} value - formatted price (see above)
+ * @return {string} value - formatted value
+ */
+
+
+function stripZeroCents(string) {
+  return string.replace(/\.00$/, '');
+}
+
+},{}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.loadImage = loadImage;
+exports.removeProtocol = removeProtocol;
+exports.imageSize = imageSize;
+exports.getSizedImageUrl = getSizedImageUrl;
+exports.preload = preload;
+
+/**
+ * Image Helper Functions
+ * -----------------------------------------------------------------------------
+ * A collection of functions that help with basic image operations.
+ *
+ */
+
+/**
+ * Loads and caches an image in the browsers cache.
+ * @param {string} path - An image url
+ */
+function loadImage(path) {
+  new Image().src = path;
+}
+
+function removeProtocol(path) {
+  return path.replace(/http(s)?:/, '');
+}
+/**
+ * Find the Shopify image attribute size
+ *
+ * @param {string} src
+ * @returns {null}
+ */
+
+
+function imageSize(src) {
+  var match = src.match(/.+_((?:pico|icon|thumb|small|compact|medium|large|grande)|\d{1,4}x\d{0,4}|x\d{1,4})[_\.@]/);
+
+  if (match) {
+    return match[1];
+  }
+
+  return null;
+}
+/**
+ * Adds a Shopify size attribute to a URL
+ *
+ * @param src
+ * @param size
+ * @returns {*}
+ */
+
+
+function getSizedImageUrl(src, size) {
+  if (size === null || src === null) {
+    return src;
+  }
+
+  if (size === 'master') {
+    return removeProtocol(src);
+  }
+
+  var match = src.match(/\.(jpg|jpeg|gif|png|bmp|bitmap|tiff|tif)(\?v=\d+)?$/i);
+  var url = null;
+
+  if (match) {
+    var prefix = src.split(match[0]);
+    var suffix = match[0];
+    url = removeProtocol(prefix[0] + '_' + size + suffix);
+  }
+
+  return url;
+}
+/**
+ * Preloads an image in memory and uses the browsers cache to store it until needed.
+ *
+ * @param {Array} images - A list of image urls
+ * @param {String} size - A shopify image size attribute
+ */
+
+
+function preload(images, size) {
+  if (typeof images === 'string') {
+    images = [images];
+  }
+
+  for (var i = 0; i < images.length; i++) {
+    var image = images[i];
+    loadImage(getSizedImageUrl(image, size));
+  }
+}
+
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -618,7 +1514,7 @@ var SectionManager = /*#__PURE__*/function () {
 
 exports.default = SectionManager;
 
-},{"../sections/base":8,"jquery":18}],7:[function(require,module,exports){
+},{"../sections/base":16,"jquery":26}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1115,7 +2011,111 @@ function credits() {
   }
 }
 
-},{"jquery":18}],8:[function(require,module,exports){
+},{"jquery":26}],15:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _base = _interopRequireDefault(require("./base"));
+
+var _ajaxFormManager = _interopRequireWildcard(require("../core/ajaxFormManager"));
+
+var _cartAPI = require("../core/cartAPI");
+
+var _ajaxCart = _interopRequireDefault(require("../components/ajaxCart"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var selectors = {
+  ajaxCart: '[data-ajax-cart]'
+};
+var $window = (0, _jquery.default)(window);
+
+var AJAXCartSection = /*#__PURE__*/function (_BaseSection) {
+  _inherits(AJAXCartSection, _BaseSection);
+
+  var _super = _createSuper(AJAXCartSection);
+
+  function AJAXCartSection(container) {
+    var _this;
+
+    _classCallCheck(this, AJAXCartSection);
+
+    _this = _super.call(this, container, 'ajax-cart');
+    _this.ajaxCart = new _ajaxCart.default((0, _jquery.default)(selectors.ajaxCart, _this.$container).first());
+    _this.ajaxFormManager = new _ajaxFormManager.default(); // Store callbacks so we can remove them later
+
+    _this.callbacks = {
+      changeSuccess: function changeSuccess(e) {
+        return _this.ajaxCart.onChangeSuccess(e.cart);
+      },
+      changeFail: function changeFail(e) {
+        return _this.ajaxCart.onChangeFail(e.description);
+      }
+    };
+    $window.on(_ajaxFormManager.events.ADD_SUCCESS, _this.callbacks.changeSuccess);
+    $window.on(_ajaxFormManager.events.ADD_FAIL, _this.callbacks.changeFail);
+    (0, _cartAPI.getCart)().then(function (cart) {
+      _this.ajaxCart.render(cart);
+
+      _this.ajaxCart.open();
+    });
+    return _this;
+  }
+
+  _createClass(AJAXCartSection, [{
+    key: "onSelect",
+    value: function onSelect() {// this.open()
+    }
+  }, {
+    key: "onDeselect",
+    value: function onDeselect() {// this.close()
+    }
+  }, {
+    key: "onUnload",
+    value: function onUnload() {// this.ajaxCart.destroy()
+      // $window.off(events.ADD_SUCCESS, this.callbacks.changeSuccess)
+      // $window.off(events.ADD_FAIL, this.callbacks.changeFail)    
+    }
+  }]);
+
+  return AJAXCartSection;
+}(_base.default);
+
+exports.default = AJAXCartSection;
+
+},{"../components/ajaxCart":1,"../core/ajaxFormManager":8,"../core/cartAPI":10,"./base":16,"jquery":26}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1178,7 +2178,7 @@ var BaseSection = /*#__PURE__*/function () {
 
 exports.default = BaseSection;
 
-},{"jquery":18}],9:[function(require,module,exports){
+},{"jquery":26}],17:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1236,7 +2236,7 @@ var CollectionSection = /*#__PURE__*/function (_BaseSection) {
 
 exports.default = CollectionSection;
 
-},{"../components/product/productCard":1,"./base":8,"jquery":18}],10:[function(require,module,exports){
+},{"../components/product/productCard":2,"./base":16,"jquery":26}],18:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1288,7 +2288,7 @@ var HeaderSection = /*#__PURE__*/function (_BaseSection) {
 
 exports.default = HeaderSection;
 
-},{"./base":8,"jquery":18}],11:[function(require,module,exports){
+},{"./base":16,"jquery":26}],19:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1345,7 +2345,7 @@ var ProductSection = /*#__PURE__*/function (_BaseSection) {
 
 exports.default = ProductSection;
 
-},{"../components/product/productDetailForm":2,"../components/product/productDetailGallery":3,"./base":8,"jquery":18}],12:[function(require,module,exports){
+},{"../components/product/productDetailForm":3,"../components/product/productDetailGallery":4,"./base":16,"jquery":26}],20:[function(require,module,exports){
 "use strict";
 
 var _jquery = _interopRequireDefault(require("jquery"));
@@ -1370,6 +2370,8 @@ var _sectionManager = _interopRequireDefault(require("./core/sectionManager"));
 
 var _header = _interopRequireDefault(require("./sections/header"));
 
+var _ajaxCart = _interopRequireDefault(require("./sections/ajaxCart"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Core
@@ -1385,6 +2387,7 @@ var setViewportHeightProperty = function setViewportHeightProperty() {
   var $body = (0, _jquery.default)(document.body);
   var sectionManager = new _sectionManager.default();
   sectionManager.register('header', _header.default);
+  sectionManager.register('ajax-cart', _ajaxCart.default);
   var appController = new _appController.default({
     viewConstructors: {
       product: _product.default,
@@ -1460,7 +2463,7 @@ var setViewportHeightProperty = function setViewportHeightProperty() {
   }
 })();
 
-},{"./core/a11y":4,"./core/appController":5,"./core/sectionManager":6,"./core/utils":7,"./sections/header":10,"./views/collection":14,"./views/index":15,"./views/page":16,"./views/product":17,"jquery":18,"throttle-debounce":20}],13:[function(require,module,exports){
+},{"./core/a11y":7,"./core/appController":9,"./core/sectionManager":13,"./core/utils":14,"./sections/ajaxCart":15,"./sections/header":18,"./views/collection":22,"./views/index":23,"./views/page":24,"./views/product":25,"jquery":26,"throttle-debounce":28}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1503,7 +2506,7 @@ var BaseView = /*#__PURE__*/function () {
 
 exports.default = BaseView;
 
-},{"../core/sectionManager":6,"jquery":18}],14:[function(require,module,exports){
+},{"../core/sectionManager":13,"jquery":26}],22:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1557,7 +2560,7 @@ var CollectionView = /*#__PURE__*/function (_BaseView) {
 
 exports.default = CollectionView;
 
-},{"../sections/collection":9,"./base":13}],15:[function(require,module,exports){
+},{"../sections/collection":17,"./base":21}],23:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1603,7 +2606,7 @@ var IndexView = /*#__PURE__*/function (_BaseView) {
 
 exports.default = IndexView;
 
-},{"./base":13}],16:[function(require,module,exports){
+},{"./base":21}],24:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1649,7 +2652,7 @@ var PageView = /*#__PURE__*/function (_BaseView) {
 
 exports.default = PageView;
 
-},{"./base":13}],17:[function(require,module,exports){
+},{"./base":21}],25:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -1703,7 +2706,7 @@ var ProductView = /*#__PURE__*/function (_BaseView) {
 
 exports.default = ProductView;
 
-},{"../sections/product":11,"./base":13}],18:[function(require,module,exports){
+},{"../sections/product":19,"./base":21}],26:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.6.0
  * https://jquery.com/
@@ -12586,10 +13589,10 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
-},{}],19:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 !function(t,n){"object"==typeof exports&&"object"==typeof module?module.exports=n():"function"==typeof define&&define.amd?define("Navigo",[],n):"object"==typeof exports?exports.Navigo=n():t.Navigo=n()}("undefined"!=typeof self?self:this,(function(){return(()=>{"use strict";var t={407:(t,n,e)=>{e.d(n,{default:()=>N});var o=/([:*])(\w+)/g,r=/\*/g,i=/\/\?/g;function a(t){return void 0===t&&(t="/"),v()?location.pathname+location.search+location.hash:t}function s(t){return t.replace(/\/+$/,"").replace(/^\/+/,"")}function c(t){return"string"==typeof t}function u(t){return t&&t.indexOf("#")>=0&&t.split("#").pop()||""}function h(t){var n=s(t).split(/\?(.*)?$/);return[s(n[0]),n.slice(1).join("")]}function f(t){for(var n={},e=t.split("&"),o=0;o<e.length;o++){var r=e[o].split("=");if(""!==r[0]){var i=decodeURIComponent(r[0]);n[i]?(Array.isArray(n[i])||(n[i]=[n[i]]),n[i].push(decodeURIComponent(r[1]||""))):n[i]=decodeURIComponent(r[1]||"")}}return n}function l(t,n){var e,a=h(s(t.currentLocationPath)),l=a[0],p=a[1],d=""===p?null:f(p),v=[];if(c(n.path)){if(e="(?:/^|^)"+s(n.path).replace(o,(function(t,n,e){return v.push(e),"([^/]+)"})).replace(r,"?(?:.*)").replace(i,"/?([^/]+|)")+"$",""===s(n.path)&&""===s(l))return{url:l,queryString:p,hashString:u(t.to),route:n,data:null,params:d}}else e=n.path;var g=new RegExp(e,""),m=l.match(g);if(m){var y=c(n.path)?function(t,n){return 0===n.length?null:t?t.slice(1,t.length).reduce((function(t,e,o){return null===t&&(t={}),t[n[o]]=decodeURIComponent(e),t}),null):null}(m,v):m.groups?m.groups:m.slice(1);return{url:s(l.replace(new RegExp("^"+t.instance.root),"")),queryString:p,hashString:u(t.to),route:n,data:y,params:d}}return!1}function p(){return!("undefined"==typeof window||!window.history||!window.history.pushState)}function d(t,n){return void 0===t[n]||!0===t[n]}function v(){return"undefined"!=typeof window}function g(t,n){return void 0===t&&(t=[]),void 0===n&&(n={}),t.filter((function(t){return t})).forEach((function(t){["before","after","already","leave"].forEach((function(e){t[e]&&(n[e]||(n[e]=[]),n[e].push(t[e]))}))})),n}function m(t,n,e){var o=n||{},r=0;!function n(){t[r]?Array.isArray(t[r])?(t.splice.apply(t,[r,1].concat(t[r][0](o)?t[r][1]:t[r][2])),n()):t[r](o,(function(t){void 0===t||!0===t?(r+=1,n()):e&&e(o)})):e&&e(o)}()}function y(t,n){void 0===t.currentLocationPath&&(t.currentLocationPath=t.to=a(t.instance.root)),t.currentLocationPath=t.instance._checkForAHash(t.currentLocationPath),n()}function _(t,n){for(var e=0;e<t.instance.routes.length;e++){var o=l(t,t.instance.routes[e]);if(o&&(t.matches||(t.matches=[]),t.matches.push(o),"ONE"===t.resolveOptions.strategy))return void n()}n()}function O(t,n){t.navigateOptions&&(void 0!==t.navigateOptions.shouldResolve&&console.warn('"shouldResolve" is deprecated. Please check the documentation.'),void 0!==t.navigateOptions.silent&&console.warn('"silent" is deprecated. Please check the documentation.')),n()}function k(t,n){!0===t.navigateOptions.force?(t.instance._setCurrent([t.instance._pathToMatchObject(t.to)]),n(!1)):n()}m.if=function(t,n,e){return Array.isArray(n)||(n=[n]),Array.isArray(e)||(e=[e]),[t,n,e]};var w=v(),L=p();function b(t,n){if(d(t.navigateOptions,"updateBrowserURL")){var e=("/"+t.to).replace(/\/\//g,"/"),o=w&&t.resolveOptions&&!0===t.resolveOptions.hash;L?(history[t.navigateOptions.historyAPIMethod||"pushState"](t.navigateOptions.stateObj||{},t.navigateOptions.title||"",o?"#"+e:e),location&&location.hash&&(t.instance.__freezeListening=!0,setTimeout((function(){var n=location.hash;location.hash="",location.hash=n,t.instance.__freezeListening=!1}),1))):w&&(window.location.href=t.to)}n()}function P(t,n){var e=t.instance;e.lastResolved()?m(e.lastResolved().map((function(n){return function(e,o){if(n.route.hooks&&n.route.hooks.leave){var r=!1,i=t.instance.matchLocation(n.route.path,t.currentLocationPath,!1);r="*"!==n.route.path?!i:!(t.matches&&t.matches.find((function(t){return n.route.path===t.route.path}))),d(t.navigateOptions,"callHooks")&&r?m(n.route.hooks.leave.map((function(n){return function(e,o){return n((function(n){!1===n?t.instance.__dirty=!1:o()}),t.matches&&t.matches.length>0?1===t.matches.length?t.matches[0]:t.matches:void 0)}})).concat([function(){return o()}])):o()}else o()}})),{},(function(){return n()})):n()}function A(t,n){d(t.navigateOptions,"updateState")&&t.instance._setCurrent(t.matches),n()}var R=[function(t,n){var e=t.instance.lastResolved();if(e&&e[0]&&e[0].route===t.match.route&&e[0].url===t.match.url&&e[0].queryString===t.match.queryString)return e.forEach((function(n){n.route.hooks&&n.route.hooks.already&&d(t.navigateOptions,"callHooks")&&n.route.hooks.already.forEach((function(n){return n(t.match)}))})),void n(!1);n()},function(t,n){t.match.route.hooks&&t.match.route.hooks.before&&d(t.navigateOptions,"callHooks")?m(t.match.route.hooks.before.map((function(n){return function(e,o){return n((function(n){!1===n?t.instance.__dirty=!1:o()}),t.match)}})).concat([function(){return n()}])):n()},function(t,n){d(t.navigateOptions,"callHandler")&&t.match.route.handler(t.match),t.instance.updatePageLinks(),n()},function(t,n){t.match.route.hooks&&t.match.route.hooks.after&&d(t.navigateOptions,"callHooks")&&t.match.route.hooks.after.forEach((function(n){return n(t.match)})),n()}],E=[P,function(t,n){var e=t.instance._notFoundRoute;if(e){t.notFoundHandled=!0;var o=h(t.currentLocationPath),r=o[0],i=o[1],a=u(t.to);e.path=s(r);var c={url:e.path,queryString:i,hashString:a,data:null,route:e,params:""!==i?f(i):null};t.matches=[c],t.match=c}n()},m.if((function(t){return t.notFoundHandled}),R.concat([A]),[function(t,n){t.resolveOptions&&!1!==t.resolveOptions.noMatchWarning&&void 0!==t.resolveOptions.noMatchWarning||console.warn('Navigo: "'+t.currentLocationPath+"\" didn't match any of the registered routes."),n()},function(t,n){t.instance._setCurrent(null),n()}])];function S(){return(S=Object.assign||function(t){for(var n=1;n<arguments.length;n++){var e=arguments[n];for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&(t[o]=e[o])}return t}).apply(this,arguments)}function H(t,n){var e=0;P(t,(function o(){e!==t.matches.length?m(R,S({},t,{match:t.matches[e]}),(function(){e+=1,o()})):A(t,n)}))}function x(t){t.instance.__dirty=!1,t.instance.__waiting.length>0&&t.instance.__waiting.shift()()}function j(){return(j=Object.assign||function(t){for(var n=1;n<arguments.length;n++){var e=arguments[n];for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&(t[o]=e[o])}return t}).apply(this,arguments)}function N(t,n){var e,o=n||{strategy:"ONE",hash:!1,noMatchWarning:!1},r=this,i="/",d=null,w=[],L=!1,P=p(),A=v();function R(t){return t.indexOf("#")>=0&&(t=!0===o.hash?t.split("#")[1]||"/":t.split("#")[0]),t}function S(t){return s(i+"/"+s(t))}function N(t,n,e,o){return t=c(t)?S(t):t,{name:o||s(String(t)),path:t,handler:n,hooks:g(e)}}function C(t,n){if(!r.__dirty){r.__dirty=!0,t=t?s(i)+"/"+s(t):void 0;var e={instance:r,to:t,currentLocationPath:t,navigateOptions:{},resolveOptions:j({},o,n)};return m([y,_,m.if((function(t){var n=t.matches;return n&&n.length>0}),H,E)],e,x),!!e.matches&&e.matches}r.__waiting.push((function(){return r.resolve(t,n)}))}function U(t,n){if(r.__dirty)r.__waiting.push((function(){return r.navigate(t,n)}));else{r.__dirty=!0,t=s(i)+"/"+s(t);var e={instance:r,to:t,navigateOptions:n||{},resolveOptions:n&&n.resolveOptions?n.resolveOptions:o,currentLocationPath:R(t)};m([O,k,_,m.if((function(t){var n=t.matches;return n&&n.length>0}),H,E),b,x],e,x)}}function q(){if(A)return(A?[].slice.call(document.querySelectorAll("[data-navigo]")):[]).forEach((function(t){"false"!==t.getAttribute("data-navigo")&&"_blank"!==t.getAttribute("target")?t.hasListenerAttached||(t.hasListenerAttached=!0,t.navigoHandler=function(n){if((n.ctrlKey||n.metaKey)&&"a"===n.target.tagName.toLowerCase())return!1;var e=t.getAttribute("href");if(null==e)return!1;if(e.match(/^(http|https)/)&&"undefined"!=typeof URL)try{var o=new URL(e);e=o.pathname+o.search}catch(t){}var i=function(t){if(!t)return{};var n,e=t.split(","),o={};return e.forEach((function(t){var e=t.split(":").map((function(t){return t.replace(/(^ +| +$)/g,"")}));switch(e[0]){case"historyAPIMethod":o.historyAPIMethod=e[1];break;case"resolveOptionsStrategy":n||(n={}),n.strategy=e[1];break;case"resolveOptionsHash":n||(n={}),n.hash="true"===e[1];break;case"updateBrowserURL":case"callHandler":case"updateState":case"force":o[e[0]]="true"===e[1]}})),n&&(o.resolveOptions=n),o}(t.getAttribute("data-navigo-options"));L||(n.preventDefault(),n.stopPropagation(),r.navigate(s(e),i))},t.addEventListener("click",t.navigoHandler)):t.hasListenerAttached&&t.removeEventListener("click",t.navigoHandler)})),r}function F(t,n,e){var o=w.find((function(n){return n.name===t})),r=null;if(o){if(r=o.path,n)for(var a in n)r=r.replace(":"+a,n[a]);r=r.match(/^\//)?r:"/"+r}return r&&e&&!e.includeRoot&&(r=r.replace(new RegExp("^/"+i),"")),r}function I(t){var n=h(s(t)),o=n[0],r=n[1],i=""===r?null:f(r);return{url:o,queryString:r,hashString:u(t),route:N(o,(function(){}),[e],o),data:null,params:i}}function M(t,n,e){return"string"==typeof n&&(n=T(n)),n?(n.hooks[t]||(n.hooks[t]=[]),n.hooks[t].push(e),function(){n.hooks[t]=n.hooks[t].filter((function(t){return t!==e}))}):(console.warn("Route doesn't exists: "+n),function(){})}function T(t){return"string"==typeof t?w.find((function(n){return n.name===S(t)})):w.find((function(n){return n.handler===t}))}t?i=s(t):console.warn('Navigo requires a root path in its constructor. If not provided will use "/" as default.'),this.root=i,this.routes=w,this.destroyed=L,this.current=d,this.__freezeListening=!1,this.__waiting=[],this.__dirty=!1,this.on=function(t,n,o){var r=this;return"object"!=typeof t||t instanceof RegExp?("function"==typeof t&&(o=n,n=t,t=i),w.push(N(t,n,[e,o])),this):(Object.keys(t).forEach((function(n){if("function"==typeof t[n])r.on(n,t[n]);else{var o=t[n],i=o.uses,a=o.as,s=o.hooks;w.push(N(n,i,[e,s],a))}})),this)},this.off=function(t){return this.routes=w=w.filter((function(n){return c(t)?s(n.path)!==s(t):"function"==typeof t?t!==n.handler:String(n.path)!==String(t)})),this},this.resolve=C,this.navigate=U,this.navigateByName=function(t,n,e){var o=F(t,n);return null!==o&&(U(o,e),!0)},this.destroy=function(){this.routes=w=[],P&&window.removeEventListener("popstate",this.__popstateListener),this.destroyed=L=!0},this.notFound=function(t,n){return r._notFoundRoute=N("*",t,[e,n],"__NOT_FOUND__"),this},this.updatePageLinks=q,this.link=function(t){return"/"+i+"/"+s(t)},this.hooks=function(t){return e=t,this},this.extractGETParameters=function(t){return h(R(t))},this.lastResolved=function(){return d},this.generate=F,this.getLinkPath=function(t){return t.getAttribute("href")},this.match=function(t){var n={instance:r,currentLocationPath:t,to:t,navigateOptions:{},resolveOptions:o};return _(n,(function(){})),!!n.matches&&n.matches},this.matchLocation=function(t,n,e){void 0===n||void 0!==e&&!e||(n=S(n));var o={instance:r,to:n,currentLocationPath:n};return y(o,(function(){})),"string"==typeof t&&(t=void 0===e||e?S(t):t),l(o,{name:String(t),path:t,handler:function(){},hooks:{}})||!1},this.getCurrentLocation=function(){return I(s(a(i)).replace(new RegExp("^"+i),""))},this.addBeforeHook=M.bind(this,"before"),this.addAfterHook=M.bind(this,"after"),this.addAlreadyHook=M.bind(this,"already"),this.addLeaveHook=M.bind(this,"leave"),this.getRoute=T,this._pathToMatchObject=I,this._clean=s,this._checkForAHash=R,this._setCurrent=function(t){return d=r.current=t},function(){P&&(this.__popstateListener=function(){r.__freezeListening||C()},window.addEventListener("popstate",this.__popstateListener))}.call(this),q.call(this)}}},n={};function e(o){if(n[o])return n[o].exports;var r=n[o]={exports:{}};return t[o](r,r.exports,e),r.exports}return e.d=(t,n)=>{for(var o in n)e.o(n,o)&&!e.o(t,o)&&Object.defineProperty(t,o,{enumerable:!0,get:n[o]})},e.o=(t,n)=>Object.prototype.hasOwnProperty.call(t,n),e(407)})().default}));
 
-},{}],20:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -12736,4 +13739,4 @@ exports.debounce = debounce;
 exports.throttle = throttle;
 
 
-},{}]},{},[12]);
+},{}]},{},[20]);

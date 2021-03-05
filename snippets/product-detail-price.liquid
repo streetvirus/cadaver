@@ -17,13 +17,15 @@
 {% endif %}
 {% comment %} End Defaults {% endcomment %}
 
-<div data-price-wrapper>
-  <span data-product-price>
+<div data-product-detail-price>
+  <span data-price>
     {{ current_variant.price | money_without_trailing_zeros }}
   </span>
 
   {% if product.compare_at_price_max > product.price %}
-    <span class="visually-hidden" data-compare-text>{{ 'products.product.regular_price' | t }}</span>
+    <span class="visually-hidden" data-compare-text>
+      {{ 'products.product.regular_price' | t }}
+    </span>
     <s data-compare-price>
       {% if current_variant.compare_at_price > current_variant.price %}
         {{ current_variant.compare_at_price | money_without_trailing_zeros }}

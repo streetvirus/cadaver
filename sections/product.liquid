@@ -3,7 +3,7 @@
 
 <div data-section-id="{{ section.id }}" data-section-type="product" itemscope itemtype="http://schema.org/Product">
   <div class="layout-content-wrapper">
-    <meta itemprop="name" content="{{ product.title }}">
+    <meta itemprop="name" content="{{ product.title | escape }}">
     <meta itemprop="url" content="{{ shop.url }}{{ current_variant.url }}">
     <meta itemprop="brand" content="{{ product.vendor }}">
     <meta itemprop="image" content="{{ featured_image | img_url: '600x600' }}">

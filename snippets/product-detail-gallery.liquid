@@ -11,8 +11,8 @@
 
 {% assign photo_main_dimension = '2000x' %}
 
-<div class="product-gallery" data-gallery>
-  <ul class="product-gallery__list">
+<div class="product-detail-gallery" data-gallery>
+  <ul class="product-detail-gallery__list">
     {% for image in product.images %}
       {% assign srcset = '' %}
       {% assign widths = '250, 440, 720, 930, 1080, 1200, 1400, 1600, 1800' | split: ', ' %}
@@ -25,7 +25,7 @@
       {% assign srcset = srcset | strip %}
 
       <li
-        class="product-gallery__item"
+        class="product-detail-gallery__item"
         data-image="{{ image.id }}"
         data-gallery-item
       >
