@@ -1,0 +1,61 @@
+.ajax-cart {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 50vh;
+  width: 400px;
+  overflow: scroll;
+  transform: translateX(100%);
+  transition: transform 500ms ease;
+  background-color: pink;
+
+  &.is-open {
+    transform: translateX(0%);
+  }
+
+  form {
+
+  }
+}
+
+.ajax-cart__body {
+
+}
+
+.ajax-cart__item {
+
+}
+
+.ajax-cart__item-image {
+
+}
+
+.ajax-cart__item-info {
+  
+}
+
+.ajax-cart__footer {
+
+}
+
+.ajax-cart__footer-row {
+
+}
+
+.ajax-cart__empty {
+  @include fill;
+  height: 100%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff80;
+  opacity: 0;
+  pointer-events: none;
+
+  .is-empty & {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

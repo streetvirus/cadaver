@@ -1,46 +1,41 @@
-<div data-section-id="{{ section.id }}" data-section-type="header">
-  <header role="banner">
-    {% assign ll = linklists[section.settings.main_menu] %}
-    {% if ll and ll.links.size > 0 %}
-      <nav class="header-nav">
-        <ul>
-          {% for link in ll.links %}
-            <li>
-              <a href="{{ link.url }}">{{ link.title | prepend: '/' }}</a>
-            </li>
-          {% endfor %}
-        </ul>
-      </nav>
+{% assign ll = linklists[section.settings.main_menu] %}
+
+<header
+  class="header"
+  role="banner"
+  data-section-id="{{ section.id }}"
+  data-section-type="header"
+>
+  <nav class="header-nav">
+    {% if ll.links.size > 0 %}
+      <ul>
+        {% for link in ll.links %}
+          <li>
+            <a href="{{ link.url }}">
+              {{ link.title | prepend: '/' }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
     {% endif %}
+  </nav>  
 
-    <a href="/" itemprop="url" title="{{ shop.name }}">
-      {% render 'header-logo' %}
-    </a>
+  <a href="/" itemprop="url" title="{{ shop.name }}">
+    {% render 'header-logo' %}
+  </a>
 
-    <a
-      href="/cart"
-      class="header-cart btn {% if cart.item_count > 0 %} has-items{% endif %}"
-      data-ajax-cart-trigger
-    >
-        Cart <span data-cart-count>{{ cart.item_count }}</span>
-    </a>
-  </header>
-</div>
+  <a
+    href="/cart"
+    class="header-cart {% if cart.item_count > 0 %} has-items{% endif %}"
+    data-ajax-cart-toggle
+  >
+      Cart <span data-cart-count>{{ cart.item_count }}</span>
+  </a>
+</header>
 
 {% schema %}
   {
     "name": "Header",
-    "settings": [
-      {
-        "type": "image_picker",
-        "id": "logo",
-        "label": "Logo"
-      },
-      {
-        "type": "checkbox",
-        "id": "social_links",
-        "label": "Show social links"
-      }
-    ]
+    "settings": []
   }
 {% endschema %}

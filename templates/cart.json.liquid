@@ -1,12 +1,7 @@
 {% comment %} Improved cart JSON response which includes full product info for cart items through product-json.liquid {% endcomment %}
 
-{% comment %} Can't access cart.token directly in liquid so we have to parse it out {% endcomment %}
-{%- assign cart_json = cart | json -%}
-{%- assign cart_token = cart_json | split: 'token":"' | last | split: '"' | first -%}
-
 {% layout none %}
 {
-  "token": {{ cart_token | json }},
   "total_price": {{ cart.total_price }},
   "original_total_price": {{ cart.original_total_price }},
   "total_discount": {{ cart.total_discount }},

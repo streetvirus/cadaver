@@ -4,11 +4,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = exports.events = void 0;
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
-var _cartAPI = _interopRequireDefault(require("../core/cartAPI"));
+var _cartAPI = require("../core/cartAPI");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18,33 +18,206 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var selectors = {
+  body: '[data-body]',
+  totalPrice: '[data-total-price]',
+  close: '[data-close]',
+  item: '[data-item]',
+  itemRemove: '[data-item-remove]',
+  bodyTemplate: '[data-ajax-cart-body-template]',
+  toggle: '[data-ajax-cart-toggle]'
+};
+var classes = {
+  open: 'is-open',
+  empty: 'is-empty',
+  bodyCartOpen: 'ajax-cart-open'
+};
+var namespace = '.ajaxCart';
+var events = {
+  CLICK: "click".concat(namespace),
+  RENDER: "render".concat(namespace)
+};
+exports.events = events;
+var $window = (0, _jquery.default)(window);
+var $body = (0, _jquery.default)(document.body);
+
 var AJAXCart = /*#__PURE__*/function () {
   function AJAXCart(el) {
     _classCallCheck(this, AJAXCart);
 
-    console.log('creating ajax cart...');
+    this.isOpen = false;
+    this.hasBeenRendered = false;
     this.$el = (0, _jquery.default)(el);
+    this.$body = (0, _jquery.default)(selectors.body, this.$el);
+    this.$totalPrice = (0, _jquery.default)(selectors.totalPrice, this.$el);
+    this.$bodyTemplate = (0, _jquery.default)(selectors.bodyTemplate);
+    this.$el.on(events.CLICK, selectors.itemRemove, this.onItemRemoveClick.bind(this));
+    $body.on(events.CLICK, selectors.toggle, this.onToggleClick.bind(this));
+    $body.on(events.CLICK, selectors.close, this.onCloseClick.bind(this));
   }
 
   _createClass(AJAXCart, [{
+    key: "bodyTemplate",
+    value: function bodyTemplate(cart) {
+      var html = '';
+
+      if (cart.items) {
+        html = _jquery.default.map(cart.items, function (_ref) {
+          var key = _ref.key,
+              quantity = _ref.quantity,
+              image = _ref.image,
+              product_title = _ref.product_title,
+              price = _ref.price,
+              variant_title = _ref.variant_title;
+          return "\n          <div class=\"ajax-cart__item\" data-key=\"".concat(key, "\" data-qty=\"").concat(quantity, "\" data-item>\n            <div class=\"ajax-cart__item-image\">\n              <img src=\"").concat(image, "\" />\n            </div>\n            <div class=\"ajax-cart__item-info\">\n              <h4>").concat(product_title, "</h4>\n              <div>").concat(price, "</div>\n              <div>").concat(variant_title, "</div>\n              ").concat(quantity > 1 ? "<div>QTY ".concat(quantity, "</div>") : '', "\n              <a href=\"#\" class=\"btn\" data-item-remove>Remove</a>\n            </div>            \n          </div>\n        ");
+        }).join('');
+      }
+
+      return html;
+    }
+    /**
+     * Ensure we are working with a valid number
+     *
+     * @param {int|string} qty
+     * @return {int} - Integer quantity.  Defaults to 1
+     */
+
+  }, {
+    key: "validateQty",
+    value: function validateQty(qty) {
+      return parseFloat(qty) === parseInt(qty) && !Number.isNaN(qty) ? qty : 1;
+    }
+    /**
+     * Get data about the cart line item row
+     *
+     * @param {HTMLElement} target - cart line item or child element
+     * @return {obj}
+     */
+
+  }, {
+    key: "getItemAttributes",
+    value: function getItemAttributes(target) {
+      var $target = (0, _jquery.default)(target);
+      var $el = $target.is(selectors.item) ? $target : $target.parents(selectors.item);
+      return {
+        $el: $el,
+        key: $el.data('key'),
+        line: $el.index() + 1,
+        qty: this.validateQty($el.data('qty'))
+      };
+    }
+    /**
+     * Builds the HTML for the ajax cart and inserts it into the container element
+     *
+     * @param {object} cart - JSON representation of the cart.  See https://help.shopify.com/themes/development/getting-started/using-ajax-api#get-cart
+     * @param {string} slot - specific slot to re-render, otherwise the entire cart will be re-rendered
+     * @return this
+     */
+
+  }, {
     key: "render",
-    value: function render(cart) {
-      console.log(cart);
+    value: function render(cart, slot) {
+      // $window.trigger($.Event(this.events.DESTROY))
+      if (slot === 'body') {
+        this.$body.html(this.bodyTemplate(cart));
+      } else if (slot === 'price') {
+        this.$totalPrice.html(cart.total_price);
+      } else {
+        this.$body.html(this.bodyTemplate(cart));
+        this.$totalPrice.html(cart.total_price);
+      }
+
+      this.onRender(cart);
+      $window.trigger(_jquery.default.Event(events.RENDER, {
+        cart: cart
+      }));
+      return this;
+    }
+  }, {
+    key: "toggle",
+    value: function toggle() {
+      return this.isOpen ? this.close() : this.open();
     }
   }, {
     key: "open",
     value: function open() {
-      console.log('open!');
+      if (this.isOpen) return;
+      this.$el.addClass(classes.open);
+      $body.addClass(classes.bodyCartOpen);
+      this.isOpen = true;
+    }
+  }, {
+    key: "close",
+    value: function close() {
+      if (!this.isOpen) return;
+      this.$el.removeClass(classes.open);
+      $body.removeClass(classes.bodyCartOpen);
+      this.isOpen = false;
     }
   }, {
     key: "onChangeSuccess",
-    value: function onChangeSuccess() {
-      console.log('onChangeSuccess');
+    value: function onChangeSuccess(cart) {
+      this.render(cart).open();
     }
   }, {
     key: "onChangeFail",
-    value: function onChangeFail() {
-      console.log('onChangeFail');
+    value: function onChangeFail() {// 
+    }
+  }, {
+    key: "onRender",
+    value: function onRender(cart) {
+      if (cart) {
+        this.$el.toggleClass(classes.empty, cart.item_count === 0);
+      }
+
+      this.hasBeenRendered = true;
+    }
+    /**
+     * Remove the item from the cart.  Extract this into a separate method if there becomes more ways to delete an item
+     *
+     * @param {event} e - Click event
+     */
+
+  }, {
+    key: "onItemRemoveClick",
+    value: function onItemRemoveClick(e) {
+      var _this = this;
+
+      e.preventDefault();
+
+      var _this$getItemAttribut = this.getItemAttributes(e.target),
+          line = _this$getItemAttribut.line,
+          $el = _this$getItemAttribut.$el;
+
+      (0, _cartAPI.changeLineItemQuantity)(line, 0).then(function (cart) {
+        if (cart.item_count > 0) {
+          // We only need to re-render the price
+          $el.remove();
+
+          _this.render(cart, 'price');
+        } else {
+          _this.render(cart);
+        }
+      }).fail(function () {
+        console.warn('something went wrong...');
+      });
+    }
+  }, {
+    key: "onToggleClick",
+    value: function onToggleClick(e) {
+      e.preventDefault(); // If we haven't rendered the cart yet, don't show it
+
+      if (!this.hasBeenRendered) {
+        return;
+      }
+
+      this.toggle();
+    }
+  }, {
+    key: "onCloseClick",
+    value: function onCloseClick(e) {
+      e.preventDefault();
+      this.close();
     }
   }]);
 
@@ -1049,7 +1222,7 @@ exports.default = AppController;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.addItemFromForm = exports.getCart = exports.formatCart = void 0;
+exports.changeLineItemQuantity = exports.addItemFromForm = exports.getCart = exports.formatCart = void 0;
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
@@ -1167,8 +1340,43 @@ var addItemFromForm = function addItemFromForm($form) {
 
   return promise;
 };
+/**
+ * Change the quantity of an item in the users cart
+ * Item is specified by line_item index (Shopify index which starts at 1 not 0)
+ *
+ * @param {Integer} line - Cart line
+ * @param {Integer} qty - New quantity of the variant
+ * @return {Promise} - JSON cart
+ */
+
 
 exports.addItemFromForm = addItemFromForm;
+
+var changeLineItemQuantity = function changeLineItemQuantity(line, qty) {
+  var promise = _jquery.default.Deferred();
+
+  _jquery.default.ajax({
+    type: 'post',
+    dataType: 'json',
+    url: '/cart/change.js',
+    data: "quantity=".concat(qty, "&line=").concat(line),
+    success: function success() {
+      getCart().then(function (cart) {
+        promise.resolve(cart);
+      });
+    },
+    error: function error() {
+      var message = 'Something went wrong.';
+      promise.reject({
+        message: message
+      });
+    }
+  });
+
+  return promise;
+};
+
+exports.changeLineItemQuantity = changeLineItemQuantity;
 
 },{"./currency":11,"./image":12,"jquery":26}],11:[function(require,module,exports){
 "use strict";
@@ -2088,19 +2296,19 @@ var AJAXCartSection = /*#__PURE__*/function (_BaseSection) {
     $window.on(_ajaxFormManager.events.ADD_FAIL, _this.callbacks.changeFail);
     (0, _cartAPI.getCart)().then(function (cart) {
       _this.ajaxCart.render(cart);
-
-      _this.ajaxCart.open();
     });
     return _this;
   }
 
   _createClass(AJAXCartSection, [{
     key: "onSelect",
-    value: function onSelect() {// this.open()
+    value: function onSelect() {
+      this.ajaxCart.open();
     }
   }, {
     key: "onDeselect",
-    value: function onDeselect() {// this.close()
+    value: function onDeselect() {
+      this.ajaxCart.close();
     }
   }, {
     key: "onUnload",
@@ -2250,9 +2458,15 @@ var _jquery = _interopRequireDefault(require("jquery"));
 
 var _base = _interopRequireDefault(require("./base"));
 
+var _ajaxCart = require("../components/ajaxCart");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
@@ -2268,6 +2482,14 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+var selectors = {
+  cartCount: '[data-cart-count]',
+  cartToggle: '[data-ajax-cart-toggle]'
+};
+var classes = {
+  hasItems: 'has-items'
+};
+
 var HeaderSection = /*#__PURE__*/function (_BaseSection) {
   _inherits(HeaderSection, _BaseSection);
 
@@ -2279,16 +2501,27 @@ var HeaderSection = /*#__PURE__*/function (_BaseSection) {
     _classCallCheck(this, HeaderSection);
 
     _this = _super.call(this, container, 'header');
-    console.log('header!!');
+    _this.$cartCount = (0, _jquery.default)(selectors.cartCount, _this.$container);
+    _this.$cartToggle = (0, _jquery.default)(selectors.cartToggle, _this.$container);
+    (0, _jquery.default)(window).on(_ajaxCart.events.RENDER, _this.onAJAXCartRender.bind(_assertThisInitialized(_this)));
     return _this;
   }
+
+  _createClass(HeaderSection, [{
+    key: "onAJAXCartRender",
+    value: function onAJAXCartRender(_ref) {
+      var cart = _ref.cart;
+      this.$cartCount.text(cart.item_count);
+      this.$cartToggle.toggleClass(classes.hasItems, cart.item_count > 0);
+    }
+  }]);
 
   return HeaderSection;
 }(_base.default);
 
 exports.default = HeaderSection;
 
-},{"./base":16,"jquery":26}],19:[function(require,module,exports){
+},{"../components/ajaxCart":1,"./base":16,"jquery":26}],19:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }

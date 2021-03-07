@@ -89,7 +89,7 @@ export const getCart = () => {
  * @return {Promise} - Resolve returns JSON cart | Reject returns an error message
  */
 export const addItemFromForm = ($form) => {
-  const promise = $.Deferred();
+  const promise = $.Deferred()
 
   $.ajax({
     type: 'post',
@@ -98,13 +98,44 @@ export const addItemFromForm = ($form) => {
     data: $form.serialize(),
     success: () => {
       getCart().then((cart) => {
-        promise.resolve(cart);
+        promise.resolve(cart)
       });
     },
     error: () => {
       promise.reject({
         message: 'The quantity you entered is not available.'
-      });
+      })
+    }
+  })
+
+  return promise;
+}
+
+/**
+ * Change the quantity of an item in the users cart
+ * Item is specified by line_item index (Shopify index which starts at 1 not 0)
+ *
+ * @param {Integer} line - Cart line
+ * @param {Integer} qty - New quantity of the variant
+ * @return {Promise} - JSON cart
+ */
+export const changeLineItemQuantity = (line, qty) => {
+  const promise = $.Deferred();
+
+  $.ajax({
+    type: 'post',
+    dataType: 'json',
+    url: '/cart/change.js',
+    data: `quantity=${qty}&line=${line}`,
+    success: () => {
+      getCart().then((cart) => {
+        promise.resolve(cart)
+      })
+    },
+    error: () => {
+      const message = 'Something went wrong.'
+      
+      promise.reject({ message })
     }
   });
 

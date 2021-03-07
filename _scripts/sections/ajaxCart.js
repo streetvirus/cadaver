@@ -28,16 +28,15 @@ export default class AJAXCartSection extends BaseSection {
 
     getCart().then(cart => {
       this.ajaxCart.render(cart)
-      this.ajaxCart.open()
     })
   }
 
   onSelect() {
-    // this.open()
+    this.ajaxCart.open()
   }
 
   onDeselect() {
-    // this.close()
+    this.ajaxCart.close()
   }
 
   onUnload() {
