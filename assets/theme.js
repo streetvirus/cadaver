@@ -117,7 +117,6 @@ var AJAXCart = /*#__PURE__*/function () {
   }, {
     key: "render",
     value: function render(cart, slot) {
-      // $window.trigger($.Event(this.events.DESTROY))
       if (slot === 'body') {
         this.$body.html(this.bodyTemplate(cart));
       } else if (slot === 'price') {
@@ -1591,13 +1590,30 @@ var SectionManager = /*#__PURE__*/function () {
 
     this.constructors = {};
     this.instances = [];
+    this.handlers = {
+      sectionLoad: this.onSectionLoad.bind(this),
+      sectionUnload: this.onSectionUnload.bind(this),
+      select: this.onSelect.bind(this),
+      deselect: this.onDeselect.bind(this),
+      reorder: this.onReorder.bind(this),
+      blockSelect: this.onBlockSelect.bind(this),
+      blockDeselect: this.onBlockDeselect.bind(this)
+    };
 
     if (window.Shopify && window.Shopify.designMode) {
-      (0, _jquery.default)(document).on('shopify:section:load', this.onSectionLoad.bind(this)).on('shopify:section:unload', this.onSectionUnload.bind(this)).on('shopify:section:select', this.onSelect.bind(this)).on('shopify:section:deselect', this.onDeselect.bind(this)).on('shopify:section:reorder', this.onReorder.bind(this)).on('shopify:block:select', this.onBlockSelect.bind(this)).on('shopify:block:deselect', this.onBlockDeselect.bind(this));
+      $document.on('shopify:section:load', this.handlers.sectionLoad).on('shopify:section:unload', this.handlers.sectionUnload).on('shopify:section:select', this.handlers.select).on('shopify:section:deselect', this.handlers.deselect).on('shopify:section:reorder', this.handlers.reorder).on('shopify:block:select', this.handlers.blockSelect).on('shopify:block:deselect', this.handlers.blockDeselect);
     }
   }
 
   _createClass(SectionManager, [{
+    key: "destroy",
+    value: function destroy() {
+      this.instances.forEach(function (section) {
+        section.onUnload && section.onUnload();
+      });
+      $document.off('shopify:section:load', this.handlers.sectionLoad).off('shopify:section:unload', this.handlers.sectionUnload).off('shopify:section:select', this.handlers.select).off('shopify:section:deselect', this.handlers.deselect).off('shopify:section:reorder', this.handlers.reorder).off('shopify:block:select', this.handlers.blockSelect).off('shopify:block:deselect', this.handlers.blockDeselect);
+    }
+  }, {
     key: "getInstanceById",
     value: function getInstanceById(id) {
       var instance;
@@ -2704,8 +2720,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _jquery = _interopRequireDefault(require("jquery"));
-
 var _sectionManager = _interopRequireDefault(require("../core/sectionManager"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -2728,9 +2742,7 @@ var BaseView = /*#__PURE__*/function () {
   _createClass(BaseView, [{
     key: "destroy",
     value: function destroy() {
-      this.sectionManager.instances.forEach(function (section) {
-        section.onUnload && section.onUnload();
-      });
+      this.sectionManager.destroy();
     }
   }]);
 
@@ -2739,7 +2751,7 @@ var BaseView = /*#__PURE__*/function () {
 
 exports.default = BaseView;
 
-},{"../core/sectionManager":13,"jquery":26}],22:[function(require,module,exports){
+},{"../core/sectionManager":13}],22:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }

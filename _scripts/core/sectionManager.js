@@ -9,17 +9,42 @@ export default class SectionManager {
     this.constructors = {};
     this.instances = [];
 
+    this.handlers = {
+      sectionLoad: this.onSectionLoad.bind(this),
+      sectionUnload: this.onSectionUnload.bind(this),
+      select: this.onSelect.bind(this),
+      deselect: this.onDeselect.bind(this),
+      reorder: this.onReorder.bind(this),
+      blockSelect: this.onBlockSelect.bind(this),
+      blockDeselect: this.onBlockDeselect.bind(this)
+    };
+
     if (window.Shopify && window.Shopify.designMode) {
-      $(document)
-        .on('shopify:section:load', this.onSectionLoad.bind(this))
-        .on('shopify:section:unload', this.onSectionUnload.bind(this))
-        .on('shopify:section:select', this.onSelect.bind(this))
-        .on('shopify:section:deselect', this.onDeselect.bind(this))
-        .on('shopify:section:reorder', this.onReorder.bind(this))
-        .on('shopify:block:select', this.onBlockSelect.bind(this))
-        .on('shopify:block:deselect', this.onBlockDeselect.bind(this));
+      $document
+        .on('shopify:section:load', this.handlers.sectionLoad)
+        .on('shopify:section:unload', this.handlers.sectionUnload)
+        .on('shopify:section:select', this.handlers.select)
+        .on('shopify:section:deselect', this.handlers.deselect)
+        .on('shopify:section:reorder', this.handlers.reorder)
+        .on('shopify:block:select', this.handlers.blockSelect)
+        .on('shopify:block:deselect', this.handlers.blockDeselect);
     }
   }
+
+  destroy() {
+    this.instances.forEach((section) => {
+      section.onUnload && section.onUnload();
+    });
+
+    $document
+      .off('shopify:section:load', this.handlers.sectionLoad)
+      .off('shopify:section:unload', this.handlers.sectionUnload)
+      .off('shopify:section:select', this.handlers.select)
+      .off('shopify:section:deselect', this.handlers.deselect)
+      .off('shopify:section:reorder', this.handlers.reorder)
+      .off('shopify:block:select', this.handlers.blockSelect)
+      .off('shopify:block:deselect', this.handlers.blockDeselect);
+  }  
 
   getInstanceById(id) {
     let instance;

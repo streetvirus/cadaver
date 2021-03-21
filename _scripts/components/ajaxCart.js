@@ -103,8 +103,6 @@ export default class AJAXCart {
    * @return this
    */
   render(cart, slot) {
-    // $window.trigger($.Event(this.events.DESTROY))
-
     if (slot === 'body') {
       this.$body.html(this.bodyTemplate(cart))
     }

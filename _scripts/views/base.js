@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import SectionManager from '../core/sectionManager'
 
 export default class BaseView {
@@ -10,8 +9,6 @@ export default class BaseView {
   }
 
   destroy() {
-    this.sectionManager.instances.forEach((section) => {
-      section.onUnload && section.onUnload();
-    });
+    this.sectionManager.destroy();
   }
 }
