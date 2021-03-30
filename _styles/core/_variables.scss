@@ -6,11 +6,13 @@ $white: #FFF;
 $body-bg:    $white;
 $color-text: $black;
 
+$spacer: 1rem;
 
 /* Typography */
 
 $font-family-base: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
+$font-weight-lighter:     lighter;
 $font-weight-thin:        100;
 $font-weight-extra-light: 200;
 $font-weight-light:       300;
@@ -20,8 +22,11 @@ $font-weight-semi-bold:   600;
 $font-weight-bold:        700;
 $font-weight-extra-bold:  800;
 $font-weight-black:       900;
+$font-weight-bolder:      bolder;
 
 $font-size-base:    1rem;
+$font-size-large:   $font-size-base * 1.5;
+$font-size-medium:  $font-size-base * 1.25;
 $font-size-small:   $font-size-base * 0.85;
 $font-size-smaller: $font-size-base * 0.8;
 $font-size-tiny:    $font-size-base * 0.75;
@@ -31,7 +36,10 @@ $line-height-small:   1.4;
 $line-height-smaller: 1.4;
 $line-height-tiny:    1.5;
 
-$breakpoints: (
+/* Grid / Screen Sizes */
+$enable-grid-classes: true;
+
+$grid-breakpoints: (
   xs: 0,
   sm: 576px,
   md: 768px,
@@ -41,10 +49,18 @@ $breakpoints: (
   xxxl: 1800px
 );
 
-$gutter: 32px;
-$content-max-width: 1400px;
+$grid-gutter-width: 32px;
+$grid-columns: 16;
+$grid-max-width: none;
 
-// Component Sizing
+$layout-vertical-padding-mobile: 100px;
+$layout-vertical-padding: 150px;
+
+$headings-margin-bottom: $spacer;
+$paragraph-margin-bottom: $spacer;
+$label-margin-bottom: $spacer * 0.5;
+
+// Z Index Stack
 $zindex-ajax-cart: 50;
 $zindex-header: 100;
 $zindex-skip-to-content: 10000;

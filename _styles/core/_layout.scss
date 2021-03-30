@@ -1,0 +1,51 @@
+// -------------------------
+// Page Layout
+// -------------------------
+
+/*
+ body
+   .layout-wrapper
+     .layout
+       .view-container
+         .view-content
+           .layout-content-wrapper
+*/
+
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: var(#{'--viewport-height'});
+
+  .layout {
+    display: flex;
+    flex: 1 0 0; // All three need to be specified for IE11
+    flex-direction: column;
+  }
+   
+  .view-container {
+    flex: 1 0 0; // All three need to be specified for IE11
+    flex-direction: column;
+  }
+
+  .view-content {
+    min-height: 100vh;
+    min-height: var(#{'--viewport-height'});
+  }
+}
+
+// Use this as the only direct child of main#MainContent on pages where you don't want the content flush to the header and footer
+// Or use the modifier classes to get flush on top or bottom
+.layout-content-wrapper {
+  padding-top: $layout-vertical-padding-mobile;
+  padding-bottom: $layout-vertical-padding-mobile;
+  
+  @include bp-up(lg) {
+    padding-top: $layout-vertical-padding;
+    padding-bottom: $layout-vertical-padding;
+  }
+
+  &.flush-top {
+    padding-top: 0;
+  }
+}

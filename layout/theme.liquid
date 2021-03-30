@@ -71,6 +71,13 @@
     {% if template.suffix != blank %} template-{{ template.name | append: '-' | append: template.suffix | handle }} {% endif %}
   {% endcapture %}
 
+  {% assign view = template.name | handle %}
+  {% if template.suffix != blank %}
+    {% assign view = view | append: '-' | append: template.suffix %}
+  {% endif %}
+
+  {% assign view = view | handle %}
+
   <body id="{{ page_title | handle }}" class="{{ body_class | strip | strip_newlines }}">
     <script type="text/javascript">document.body.className += ' is-loading';</script>
     <a class="in-page-link visually-hidden skip-link" href="#view-container">
@@ -81,8 +88,8 @@
       <div class="layout">
         {% section 'header' %}
 
-        <main id="view-container" class="view-container" role="main">
-          <div id="view-content" class="view-content">
+        <main id="view-container" class="view-container" role="main" data-router-wrapper>
+          <div id="view-content" class="view-content" data-router-view="{{ view }}">
             {{ content_for_layout }}
           </div>
         </main>

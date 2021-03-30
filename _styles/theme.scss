@@ -1,16 +1,8 @@
-@import 'variables';
-@import 'mixins';
-@import 'mixins';
-@import 'reset';
-@import 'normalize';
-@import 'core';
-@import 'fonts';
-@import 'forms';
-@import 'buttons';
-@import 'transitions';
-@import 'helpers';
-@import 'components';
+// @import 'vendor/...';
 
+@import 'core';
+@import 'components';
+@import 'transitions'; // Not sure we need this yet..
 
 html.js {
   body {
@@ -23,4 +15,15 @@ html.js {
       opacity: 1;
     }
   }
+}
+
+// Fix Shopify preview stuff
+html {
+  padding-bottom: 0 !important; // Shopify admin bar messes this up
+}
+
+/* stylelint-disable-next-line selector-max-id */
+#preview-bar-iframe,
+.shopify-preview-bar {
+  display: none;
 }

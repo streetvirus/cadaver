@@ -8,7 +8,7 @@ import $ from 'jquery';
  */ 
 
 // Match those set in variables.scss
-const transitionTimingDurations = {
+export const transitionTimingDurations = {
   base:     300,
   fast:     150,
   fastest:  50,
@@ -17,12 +17,48 @@ const transitionTimingDurations = {
   none:     0
 };
 
-const transitionTimingFunctions = {
+export const transitionTimingFunctions = {
   base:      'ease-in-out',
   in:        'ease-out',
   out:       'ease-in',
   inOutUI:   'cubic-bezier(0.42, 0, 0.13, 1.04)'
 };
+
+// To add more see the full library - https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
+export const easings = {
+  // t: current time, b: begInnIng value, c: change In value, d: duration
+  easeInCubic: function (x, t, b, c, d) {
+    return c*(t/=d)*t*t + b;
+  },
+  easeOutCubic: function (x, t, b, c, d) {
+    return c*((t=t/d-1)*t*t + 1) + b;
+  },
+  easeInOutCubic: function (x, t, b, c, d) {
+    if ((t/=d/2) < 1) return c/2*t*t*t + b;
+    return c/2*((t-=2)*t*t + 2) + b;
+  },
+  // easeInQuart: function (x, t, b, c, d) {
+  //   return c*(t/=d)*t*t*t + b;
+  // },
+  easeOutQuart: function (x, t, b, c, d) {
+    return -c * ((t=t/d-1)*t*t*t - 1) + b;
+  }
+  // ,
+  // easeInOutQuart: function (x, t, b, c, d) {
+  //   if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
+  //   return -c/2 * ((t-=2)*t*t*t - 2) + b;
+  // },
+  // easeInQuint(x, t, b, c, d) {
+  //   return c*(t/=d)*t*t*t*t + b;
+  // },
+  // easeOutQuint(x, t, b, c, d) {
+  //   return c*((t=t/d-1)*t*t*t*t + 1) + b;
+  // },
+  // easeInOutQuint(x, t, b, c, d) {
+  //   if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
+  //   return c/2*((t-=2)*t*t*t*t + 2) + b;
+  // }
+}
 
 /**
 * Get one of the durations stored in the variable defined above
@@ -54,43 +90,6 @@ export function getTransitionTimingFunction(key) {
   return transitionTimingFunctions[k];
 }
 
-/* eslint-disable */
 export function initialize() {
-  // Add some extra easing equations
-  // To add more see the full library - https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
-  $.extend($.easing, {
-    // t: current time, b: begInnIng value, c: change In value, d: duration
-    easeInCubic: function (x, t, b, c, d) {
-      return c*(t/=d)*t*t + b;
-    },
-    easeOutCubic: function (x, t, b, c, d) {
-      return c*((t=t/d-1)*t*t + 1) + b;
-    },
-    easeInOutCubic: function (x, t, b, c, d) {
-      if ((t/=d/2) < 1) return c/2*t*t*t + b;
-      return c/2*((t-=2)*t*t + 2) + b;
-    },
-    // easeInQuart: function (x, t, b, c, d) {
-    //   return c*(t/=d)*t*t*t + b;
-    // },
-    easeOutQuart: function (x, t, b, c, d) {
-      return -c * ((t=t/d-1)*t*t*t - 1) + b;
-    }
-    // ,
-    // easeInOutQuart: function (x, t, b, c, d) {
-    //   if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-    //   return -c/2 * ((t-=2)*t*t*t - 2) + b;
-    // },
-    // easeInQuint(x, t, b, c, d) {
-    //   return c*(t/=d)*t*t*t*t + b;
-    // },
-    // easeOutQuint(x, t, b, c, d) {
-    //   return c*((t=t/d-1)*t*t*t*t + 1) + b;
-    // },
-    // easeInOutQuint(x, t, b, c, d) {
-    //   if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-    //   return c/2*((t-=2)*t*t*t*t + 2) + b;
-    // }
-  });
+  $.extend($.easing, easings); // Add some extra easing equations
 }
-/* eslint-enable */

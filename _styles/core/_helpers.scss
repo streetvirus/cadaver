@@ -48,7 +48,7 @@
   @include visually-shown(absolute);
   color: $color-text;
   background-color: $body-bg;
-  padding: $gutter / 2;
+  padding: $grid-gutter-width / 2;
   z-index: $zindex-skip-to-content;
   transition: none;
 }

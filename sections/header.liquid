@@ -1,4 +1,4 @@
-{% assign ll = linklists[section.settings.main_menu] %}
+{% assign ll = linklists[section.settings.menu] %}
 
 <header
   class="header"
@@ -7,12 +7,13 @@
   data-section-type="header"
 >
   <nav class="header-nav">
+
     {% if ll.links.size > 0 %}
       <ul>
         {% for link in ll.links %}
           <li>
             <a href="{{ link.url }}">
-              {{ link.title | prepend: '/' }}
+              {{ link.title }}
             </a>
           </li>
         {% endfor %}
@@ -27,6 +28,7 @@
   <a
     href="/cart"
     class="header-cart {% if cart.item_count > 0 %} has-items{% endif %}"
+    data-router-disabled
     data-ajax-cart-toggle
   >
       Cart <span data-cart-count>{{ cart.item_count }}</span>
@@ -36,6 +38,12 @@
 {% schema %}
   {
     "name": "Header",
-    "settings": []
+    "settings": [
+      {
+        "type": "link_list",
+        "id": "menu",
+        "label": "Menu"
+      }
+    ]
   }
 {% endschema %}

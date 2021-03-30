@@ -31,12 +31,20 @@ export default class AJAXCartSection extends BaseSection {
     })
   }
 
+  open() {
+    this.ajaxCart.open();
+  }
+
+  close() {
+    this.ajaxCart.close();
+  }
+
   onSelect() {
-    this.ajaxCart.open()
+    this.open();
   }
 
   onDeselect() {
-    this.ajaxCart.close()
+    this.close();
   }
 
   onUnload() {

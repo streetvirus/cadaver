@@ -18,7 +18,7 @@ export default class BaseSection {
   }
 
   onUnload(e) {
-    console.log('unload - ' + this.name)
+    console.log(`Unloading "${this.name}"`)
   }
 
   onSelect(e) {

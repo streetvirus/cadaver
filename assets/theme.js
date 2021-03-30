@@ -225,7 +225,7 @@ var AJAXCart = /*#__PURE__*/function () {
 
 exports.default = AJAXCart;
 
-},{"../core/cartAPI":11,"jquery":27}],2:[function(require,module,exports){
+},{"../core/cartAPI":11,"jquery":30}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -237,8 +237,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var ProductCard = function ProductCard() {
   _classCallCheck(this, ProductCard);
-
-  console.log('new product card');
 };
 
 exports.default = ProductCard;
@@ -309,8 +307,10 @@ var ProductDetailForm = /*#__PURE__*/function () {
     this.$addToCartBtn = (0, _jquery.default)(selectors.addToCartBtn, this.$container);
     this.$addToCartBtnText = (0, _jquery.default)(selectors.addToCartText, this.$container); // Text inside the add to cart button
 
-    this.defaultButtonText = this.$addToCartBtnText.text();
+    this.defaultButtonText = 'Add to Cart'; // this.$addToCartBtnText.text()
+
     this.product = JSON.parse((0, _jquery.default)(selectors.productJSON, this.$el).html());
+    this.price = new _productDetailPrice.default(this.$productDetailPrice);
     this.variants = new _variants.default({
       $container: this.$el,
       enableHistoryState: this.settings.enableHistoryState,
@@ -318,7 +318,6 @@ var ProductDetailForm = /*#__PURE__*/function () {
       originalSelectorId: selectors.originalSelectorId,
       product: this.product
     });
-    this.price = new _productDetailPrice.default(this.$productDetailPrice);
     this.$el.on('variantChange', this.onVariantChange.bind(this));
     this.$el.on('click', selectors.variantOptionValue, this.onVariantOptionValueClick.bind(this));
     $window.on(_ajaxFormManager.events.ADD_START, this.onAddStart.bind(this));
@@ -424,7 +423,7 @@ var ProductDetailForm = /*#__PURE__*/function () {
 
 exports.default = ProductDetailForm;
 
-},{"../../core/ajaxFormManager":8,"./productDetailPrice":5,"./variants":6,"jquery":27}],4:[function(require,module,exports){
+},{"../../core/ajaxFormManager":8,"./productDetailPrice":5,"./variants":6,"jquery":30}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -434,10 +433,9 @@ exports.default = void 0;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ProductDetailGallery = function ProductDetailGallery() {
-  _classCallCheck(this, ProductDetailGallery);
+var ProductDetailGallery = function ProductDetailGallery() {//
 
-  console.log('new product detail gallery');
+  _classCallCheck(this, ProductDetailGallery);
 };
 
 exports.default = ProductDetailGallery;
@@ -507,7 +505,7 @@ var ProductDetailPrice = /*#__PURE__*/function () {
 
 exports.default = ProductDetailPrice;
 
-},{"../../core/currency":12,"jquery":27}],6:[function(require,module,exports){
+},{"../../core/currency":12,"jquery":30}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -728,7 +726,7 @@ var Variants = /*#__PURE__*/function () {
 
 exports.default = Variants;
 
-},{"../../core/utils":15,"jquery":27}],7:[function(require,module,exports){
+},{"../../core/utils":15,"jquery":30}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -836,7 +834,7 @@ function removeTrapFocus(options) {
   (0, _jquery.default)(document).off(eventName);
 }
 
-},{"jquery":27}],8:[function(require,module,exports){
+},{"jquery":30}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -917,7 +915,7 @@ var AJAXFormManager = function AJAXFormManager() {
 
 exports.default = AJAXFormManager;
 
-},{"./cartAPI":11,"./utils":15,"jquery":27}],9:[function(require,module,exports){
+},{"./cartAPI":11,"./utils":15,"jquery":30}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -926,6 +924,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.getTransitionTimingDuration = getTransitionTimingDuration;
 exports.getTransitionTimingFunction = getTransitionTimingFunction;
 exports.initialize = initialize;
+exports.easings = exports.transitionTimingFunctions = exports.transitionTimingDurations = void 0;
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
@@ -946,11 +945,48 @@ var transitionTimingDurations = {
   medium: 400,
   none: 0
 };
+exports.transitionTimingDurations = transitionTimingDurations;
 var transitionTimingFunctions = {
   base: 'ease-in-out',
   in: 'ease-out',
   out: 'ease-in',
   inOutUI: 'cubic-bezier(0.42, 0, 0.13, 1.04)'
+}; // To add more see the full library - https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
+
+exports.transitionTimingFunctions = transitionTimingFunctions;
+var easings = {
+  // t: current time, b: begInnIng value, c: change In value, d: duration
+  easeInCubic: function easeInCubic(x, t, b, c, d) {
+    return c * (t /= d) * t * t + b;
+  },
+  easeOutCubic: function easeOutCubic(x, t, b, c, d) {
+    return c * ((t = t / d - 1) * t * t + 1) + b;
+  },
+  easeInOutCubic: function easeInOutCubic(x, t, b, c, d) {
+    if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
+    return c / 2 * ((t -= 2) * t * t + 2) + b;
+  },
+  // easeInQuart: function (x, t, b, c, d) {
+  //   return c*(t/=d)*t*t*t + b;
+  // },
+  easeOutQuart: function easeOutQuart(x, t, b, c, d) {
+    return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+  } // ,
+  // easeInOutQuart: function (x, t, b, c, d) {
+  //   if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
+  //   return -c/2 * ((t-=2)*t*t*t - 2) + b;
+  // },
+  // easeInQuint(x, t, b, c, d) {
+  //   return c*(t/=d)*t*t*t*t + b;
+  // },
+  // easeOutQuint(x, t, b, c, d) {
+  //   return c*((t=t/d-1)*t*t*t*t + 1) + b;
+  // },
+  // easeInOutQuint(x, t, b, c, d) {
+  //   if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
+  //   return c/2*((t-=2)*t*t*t*t + 2) + b;
+  // }
+
 };
 /**
 * Get one of the durations stored in the variable defined above
@@ -959,6 +995,8 @@ var transitionTimingFunctions = {
 * @param {string} key - string matching one of the key names
 * @return {int} - duration in ms
 */
+
+exports.easings = easings;
 
 function getTransitionTimingDuration(key) {
   var k = 'base';
@@ -987,348 +1025,119 @@ function getTransitionTimingFunction(key) {
 
   return transitionTimingFunctions[k];
 }
-/* eslint-disable */
-
 
 function initialize() {
-  // Add some extra easing equations
-  // To add more see the full library - https://github.com/danro/jquery-easing/blob/master/jquery.easing.js
-  _jquery.default.extend(_jquery.default.easing, {
-    // t: current time, b: begInnIng value, c: change In value, d: duration
-    easeInCubic: function easeInCubic(x, t, b, c, d) {
-      return c * (t /= d) * t * t + b;
-    },
-    easeOutCubic: function easeOutCubic(x, t, b, c, d) {
-      return c * ((t = t / d - 1) * t * t + 1) + b;
-    },
-    easeInOutCubic: function easeInOutCubic(x, t, b, c, d) {
-      if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
-      return c / 2 * ((t -= 2) * t * t + 2) + b;
-    },
-    // easeInQuart: function (x, t, b, c, d) {
-    //   return c*(t/=d)*t*t*t + b;
-    // },
-    easeOutQuart: function easeOutQuart(x, t, b, c, d) {
-      return -c * ((t = t / d - 1) * t * t * t - 1) + b;
-    } // ,
-    // easeInOutQuart: function (x, t, b, c, d) {
-    //   if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-    //   return -c/2 * ((t-=2)*t*t*t - 2) + b;
-    // },
-    // easeInQuint(x, t, b, c, d) {
-    //   return c*(t/=d)*t*t*t*t + b;
-    // },
-    // easeOutQuint(x, t, b, c, d) {
-    //   return c*((t=t/d-1)*t*t*t*t + 1) + b;
-    // },
-    // easeInOutQuint(x, t, b, c, d) {
-    //   if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-    //   return c/2*((t-=2)*t*t*t*t + 2) + b;
-    // }
+  _jquery.default.extend(_jquery.default.easing, easings); // Add some extra easing equations
 
-  });
 }
-/* eslint-enable */
 
-},{"jquery":27}],10:[function(require,module,exports){
+},{"jquery":30}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.getBreakpointMinWidth = getBreakpointMinWidth;
+exports.getBreakpointMinWidthKeyForWidth = getBreakpointMinWidthKeyForWidth;
+exports.onResize = onResize;
+exports.initialize = initialize;
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
-var _navigo = _interopRequireDefault(require("navigo"));
-
-var _base = _interopRequireDefault(require("../views/base"));
-
-var _utils = require("./utils");
+var _throttleDebounce = require("throttle-debounce");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+/**
+ * Breakpoint Helper Functions / constants
+ * -----------------------------------------------------------------------------
+ * A collection of functions that help with dealing with site breakpoints in JS
+ * All breakpoint properties should be defined here
+ *
+ */
+var $window = (0, _jquery.default)(window);
+var cachedWindowWidth = $window.width(); // Match those set in variables.scss
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+var breakpointMinWidths = {
+  xs: 0,
+  sm: 576,
+  md: 768,
+  lg: 1024,
+  xl: 1200,
+  xxl: 1480,
+  xxxl: 1800
+};
+var events = {
+  BREAKPOINT_CHANGE: 'breakpointChange'
+};
+/**
+ * Get one of the widths stored in the variable defined above
+ *
+ * @param {string} key - string matching one of the key names
+ * @return {int} - pixel width
+ */
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function getBreakpointMinWidth(key) {
+  var w;
 
-var $body = (0, _jquery.default)(document.body);
-var TEMPLATE_REGEX = /(^|\s)template-\S+/g;
-
-var AppController = /*#__PURE__*/function () {
-  function AppController() {
-    var _this = this;
-
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, AppController);
-
-    var defaults = {
-      viewContainerSelector: '.view-container',
-      viewContentSelector: '.view-content',
-      viewConstructors: {},
-      redirectTimeoutMs: 5000,
-      onSameRoute: function onSameRoute() {},
-      onBeforeRouteStart: function onBeforeRouteStart(d) {
-        return d.resolve();
-      },
-      onRouteStart: function onRouteStart(url, type) {},
-      onViewTransitionOutDone: function onViewTransitionOutDone(url, d) {
-        return d.resolve();
-      },
-      // eslint-disable-line brace-style
-      onViewChangeStart: function onViewChangeStart() {},
-      onViewChangeComplete: function onViewChangeComplete() {},
-      onViewReady: function onViewReady() {},
-      onInitialViewReady: function onInitialViewReady() {}
-    };
-    this.router = new _navigo.default('/');
-    this.isTransitioning = false;
-    this.currentView = null;
-    this.firstRoute = true;
-    this.settings = _jquery.default.extend({}, defaults, options);
-    this.urlCache = {};
-    this.$viewContainer = (0, _jquery.default)(this.settings.viewContainerSelector); // Add Routes
-
-    this.router.on('/products/:slug', function (_ref) {
-      var data = _ref.data;
-
-      _this.doRoute("/products/".concat(data.slug), 'product');
-    }); // Product preview - This is an important route otherwise the admin product preview functionality won't work!
-
-    this.router.on('/products_preview', function (_ref2) {
-      var queryString = _ref2.queryString;
-
-      _this.doRoute("/products_preview?".concat(queryString), 'product');
-    }); // Collection
-
-    this.router.on('/collections/:slug', function (_ref3) {
-      var data = _ref3.data,
-          queryString = _ref3.queryString;
-      var url = "/collections/".concat(data.slug);
-
-      if (queryString) {
-        url += "?".concat(queryString);
-      }
-
-      _this.doRoute(url, 'collection');
-    }); // Tagged collection
-
-    this.router.on('/collections/:slug/:tag', function (_ref4) {
-      var data = _ref4.data,
-          queryString = _ref4.queryString;
-      var url = "/collections/".concat(data.slug, "/").concat(data.tag);
-
-      if (queryString) {
-        url += "?".concat(queryString);
-      }
-
-      _this.doRoute(url, 'collection');
-    }); // Product within a collection
-
-    this.router.on('/collections/:slug/products/:handle', function (_ref5) {
-      var data = _ref5.data,
-          queryString = _ref5.queryString;
-
-      _this.doRoute("/collections/".concat(data.slug, "/products/").concat(data.handle), 'product');
-    });
-    this.router.on('/collections', function () {
-      _this.doRoute('/collections', 'list-collections');
-    });
-    this.router.on('/products', function () {
-      _this.doRoute('/products', 'list-collections');
-    });
-    this.router.on('/cart', function () {
-      _this.doRoute('/cart', 'cart');
-    });
-    this.router.on('/pages/:slug', function (_ref6) {
-      var data = _ref6.data;
-
-      _this.doRoute("/pages/".concat(data.slug), 'page', true);
-    });
-    this.router.on('/blogs/:slug', function (_ref7) {
-      var data = _ref7.data;
-
-      _this.doRoute("/blogs/".concat(data.slug), 'blog', true);
-    });
-    this.router.on('/', function () {
-      _this.doRoute('/', 'index');
-    });
-    this.router.on('/challenge', function () {
-      _this.doRoute('/challenge');
-    });
-    this.router.notFound(function (params) {
-      // called when there is path specified but
-      // there is no route matching
-      // console.log(params);
-      _this.router.navigate('/'); // Just go back home
-
-    });
+  if (breakpointMinWidths.hasOwnProperty(key)) {
+    w = breakpointMinWidths[key];
   }
 
-  _createClass(AppController, [{
-    key: "start",
-    value: function start() {
-      this.router.resolve();
+  return w;
+}
+/**
+ * Gets the key for one of the breakpoint widths, whichever is closest but smaller to the passed in width
+ * So if we pass in a width between 'sm' and 'md', this will return 'sm'
+ *
+ * @param {int} w - width to search for
+ * @return {undefined|string} foundKey
+ */
+
+
+function getBreakpointMinWidthKeyForWidth(w) {
+  var width = w || $window.width();
+  var foundKey;
+
+  _jquery.default.each(breakpointMinWidths, function (k, bpMinWidth) {
+    if (width >= bpMinWidth) {
+      foundKey = k;
     }
-    /**
-     * Fetches a new page for the passed in url and passes it to the view change method
-     *
-     * @param {string} url
-     * @param {string} type - type of view
-     * @param {boolean} - cacheable - whether or not this page can be cached on the frontend
-     */
+  });
 
-  }, {
-    key: "doRoute",
-    value: function doRoute(url, type) {
-      var _this2 = this;
-
-      var cacheable = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var ViewConstructor = this.settings.viewConstructors[type] || _base.default;
-
-      if (this.firstRoute) {
-        // Can't cache here, at this point the DOM has been altered via JS.
-        // We can only cache fresh HTML from the server
-        this.currentView = new ViewConstructor(this.$viewContainer, type);
-        this.settings.onViewReady(this.currentView);
-        this.firstRoute = false;
-        this.settings.onInitialViewReady(this.currentView);
-        return;
-      }
-
-      var urlKey = (0, _utils.hashFromString)(url);
-
-      var ajaxDeferred = _jquery.default.Deferred();
-
-      var transitionDeferred = _jquery.default.Deferred();
-
-      var beforeRouteStartDeferred = _jquery.default.Deferred(); // If we already have the page HTML in our cache...
+  return foundKey;
+}
+/**
+ * Triggers a window event when a breakpoint is crossed, passing the new minimum breakpoint width key as an event parameter
+ *
+ */
 
 
-      if (cacheable && this.urlCache.hasOwnProperty(urlKey)) {
-        ajaxDeferred.resolve(this.urlCache[urlKey]);
-      } else {
-        // Add a timeout to do a basic redirect to the url if the request takes longer than a few seconds
-        var t = setTimeout(function () {
-          window.location = url;
-        }, this.settings.redirectTimeoutMs);
+function onResize() {
+  var newWindowWidth = $window.width();
 
-        _jquery.default.get(url, function (response) {
-          clearTimeout(t);
-          ajaxDeferred.resolve(response); // Cache it for next time
+  _jquery.default.each(breakpointMinWidths, function (k, bpMinWidth) {
+    // eslint-disable-line consistent-return
+    if (newWindowWidth >= bpMinWidth && cachedWindowWidth < bpMinWidth || cachedWindowWidth >= bpMinWidth && newWindowWidth < bpMinWidth) {
+      var bpMinWidthKey = getBreakpointMinWidthKeyForWidth(newWindowWidth);
 
-          if (cacheable && !_this2.urlCache.hasOwnProperty(urlKey)) {
-            _this2.urlCache[urlKey] = response;
-          }
-        });
-      }
-
-      this.settings.onBeforeRouteStart(beforeRouteStartDeferred);
-
-      _jquery.default.when(beforeRouteStartDeferred).done(function () {
-        _this2.settings.onRouteStart(url, type); // Transition out as soon as the link is clicked?  Need to add min time before viewchage to allow the transition to complete?
-        // @TODO - Need to handle the case when there isn't a transition defined
-
-
-        _this2.$viewContainer.one('transitionend', function () {
-          // transitionDeferred.resolve();
-          _this2.settings.onViewTransitionOutDone(url, transitionDeferred);
-        });
-
-        _this2.$viewContainer.find(_this2.settings.viewContentSelector).addClass('transition-out'); // Let the current view do it's 'out' transition and then apply the loading state
-        // this.currentView.beforeTransitionOut(() => {
-        //   this.settings.onViewTransitionOutDone(url, transitionDeferred);
-        // });
-        // Once AJAX *and* css animations are done, trigger the callback
-
-
-        _jquery.default.when(ajaxDeferred, transitionDeferred).done(function (response) {
-          _this2.doViewChange(response, ViewConstructor, type, url);
-        });
+      var e = _jquery.default.Event(events.BREAKPOINT_CHANGE, {
+        bpMinWidthKey: bpMinWidthKey
       });
+
+      $window.trigger(e);
+      return false;
     }
-  }, {
-    key: "doViewChange",
-    value: function doViewChange(AJAXResponse, ViewConstructor, type, url) {
-      var _this3 = this;
+  });
 
-      // Kill the current view
-      this.currentView.destroy();
-      var $responseHtml = (0, _jquery.default)(document.createElement('html'));
-      $responseHtml.get(0).innerHTML = AJAXResponse;
-      var $responseHead = $responseHtml.find('head');
-      var $responseBody = $responseHtml.find('body'); // Do DOM updates
+  cachedWindowWidth = $window.width();
+}
 
-      this.setDocumentTitle($responseHead.find('title').text());
-      var $oldViewContent = this.$viewContainer.find(this.settings.viewContentSelector);
-      var $newViewContent = $responseBody.find(this.settings.viewContentSelector);
-      $newViewContent.addClass('transition-in'); // This is what hides it from view, needed before we append to DOM
-      // Here's where we append the new dom, transition out the old dom, and then do cleanup
+function initialize() {
+  $window.on('resize', (0, _throttleDebounce.throttle)(20, onResize));
+}
 
-      this.$viewContainer.append($newViewContent);
-      var newView = new ViewConstructor($newViewContent, type); // Wait for everything to load before animating in?
-
-      this.settings.onViewChangeStart(url, newView); // Update the body ID
-
-      $body.attr('id', $responseBody.attr('id')); // Update the body class
-
-      $body.removeClass(function (i, currentClasses) {
-        return currentClasses.split(' ').map(function (classname) {
-          return classname.match(TEMPLATE_REGEX);
-        }).join(' ');
-      });
-      $body.addClass(function () {
-        return $responseBody.attr('class').split(' ').map(function (classname) {
-          return classname.match(TEMPLATE_REGEX);
-        }).join(' ');
-      }); // let now = Date.now();
-      // $oldViewContent.one('transitionend', (e) => {
-
-      $newViewContent.addClass('transition-in-active'); // I don't know what's going on
-      // $newViewContent.one('transitionend') was firing because of child product cards transitioning in?
-
-      setTimeout(function () {
-        // window.scrollTo && window.scrollTo(0, 0);
-        $newViewContent.removeClass('transition-in transition-in-active');
-        $oldViewContent.remove(); // this.settings.onViewChangeDOMUpdatesComplete($responseHead, $responseBody);
-
-        _this3.currentView = newView;
-
-        _this3.settings.onViewChangeComplete(_this3.currentView); // Is there a callback for this?
-
-
-        _this3.settings.onViewReady(_this3.currentView);
-
-        _this3.isTransitioning = false;
-      }, 300); // });
-      // setTimeout(() => {
-      //   $oldViewContent.addClass('transition-out');
-      // }, 20);
-    }
-  }, {
-    key: "navigate",
-    value: function navigate(url) {
-      console.log('navigate - ' + url);
-      this.router.navigate(url);
-      return this;
-    }
-  }, {
-    key: "setDocumentTitle",
-    value: function setDocumentTitle(title) {
-      document.title = title;
-      return this;
-    }
-  }]);
-
-  return AppController;
-}();
-
-exports.default = AppController;
-
-},{"../views/base":22,"./utils":15,"jquery":27,"navigo":28}],11:[function(require,module,exports){
+},{"jquery":30,"throttle-debounce":31}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1490,7 +1299,7 @@ var changeLineItemQuantity = function changeLineItemQuantity(line, qty) {
 
 exports.changeLineItemQuantity = changeLineItemQuantity;
 
-},{"./currency":12,"./image":13,"jquery":27}],12:[function(require,module,exports){
+},{"./currency":12,"./image":13,"jquery":30}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1866,7 +1675,7 @@ var SectionManager = /*#__PURE__*/function () {
 
 exports.default = SectionManager;
 
-},{"../sections/base":17,"jquery":27}],15:[function(require,module,exports){
+},{"../sections/base":23,"jquery":30}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2370,7 +2179,353 @@ function credits() {
   }
 }
 
-},{"jquery":27}],16:[function(require,module,exports){
+},{"jquery":30}],16:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _highway = _interopRequireDefault(require("@dogstudio/highway"));
+
+var _sectionManager = _interopRequireDefault(require("../core/sectionManager"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var BaseRenderer = /*#__PURE__*/function (_Highway$Renderer) {
+  _inherits(BaseRenderer, _Highway$Renderer);
+
+  var _super = _createSuper(BaseRenderer);
+
+  function BaseRenderer(properties) {
+    var _this;
+
+    _classCallCheck(this, BaseRenderer);
+
+    _this = _super.call(this, properties);
+    _this.sectionManager = new _sectionManager.default();
+    return _this;
+  }
+
+  _createClass(BaseRenderer, [{
+    key: "onLeave",
+    value: function onLeave() {
+      this.sectionManager.destroy();
+    }
+  }]);
+
+  return BaseRenderer;
+}(_highway.default.Renderer);
+
+exports.default = BaseRenderer;
+
+},{"../core/sectionManager":14,"@dogstudio/highway":29}],17:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _base = _interopRequireDefault(require("./base"));
+
+var _collection = _interopRequireDefault(require("../sections/collection"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var CollectionRenderer = /*#__PURE__*/function (_BaseRenderer) {
+  _inherits(CollectionRenderer, _BaseRenderer);
+
+  var _super = _createSuper(CollectionRenderer);
+
+  function CollectionRenderer() {
+    _classCallCheck(this, CollectionRenderer);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(CollectionRenderer, [{
+    key: "onEnter",
+    value: function onEnter() {
+      this.sectionManager.register('collection', _collection.default);
+    }
+  }]);
+
+  return CollectionRenderer;
+}(_base.default);
+
+exports.default = CollectionRenderer;
+
+},{"../sections/collection":24,"./base":16}],18:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _base = _interopRequireDefault(require("./base"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var IndexRenderer = /*#__PURE__*/function (_BaseRenderer) {
+  _inherits(IndexRenderer, _BaseRenderer);
+
+  var _super = _createSuper(IndexRenderer);
+
+  function IndexRenderer() {
+    _classCallCheck(this, IndexRenderer);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(IndexRenderer, [{
+    key: "onEnter",
+    value: function onEnter() {}
+  }]);
+
+  return IndexRenderer;
+}(_base.default);
+
+exports.default = IndexRenderer;
+
+},{"./base":16}],19:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _base = _interopRequireDefault(require("./base"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var PageRenderer = /*#__PURE__*/function (_BaseRenderer) {
+  _inherits(PageRenderer, _BaseRenderer);
+
+  var _super = _createSuper(PageRenderer);
+
+  function PageRenderer() {
+    _classCallCheck(this, PageRenderer);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(PageRenderer, [{
+    key: "onEnter",
+    value: function onEnter() {}
+  }]);
+
+  return PageRenderer;
+}(_base.default);
+
+exports.default = PageRenderer;
+
+},{"./base":16}],20:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _base = _interopRequireDefault(require("./base"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var PageCustomRenderer = /*#__PURE__*/function (_BaseRenderer) {
+  _inherits(PageCustomRenderer, _BaseRenderer);
+
+  var _super = _createSuper(PageCustomRenderer);
+
+  function PageCustomRenderer() {
+    _classCallCheck(this, PageCustomRenderer);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(PageCustomRenderer, [{
+    key: "onEnter",
+    value: function onEnter() {}
+  }]);
+
+  return PageCustomRenderer;
+}(_base.default);
+
+exports.default = PageCustomRenderer;
+
+},{"./base":16}],21:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _base = _interopRequireDefault(require("./base"));
+
+var _product = _interopRequireDefault(require("../sections/product"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var ProductRenderer = /*#__PURE__*/function (_BaseRenderer) {
+  _inherits(ProductRenderer, _BaseRenderer);
+
+  var _super = _createSuper(ProductRenderer);
+
+  function ProductRenderer() {
+    _classCallCheck(this, ProductRenderer);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(ProductRenderer, [{
+    key: "onEnter",
+    value: function onEnter() {
+      this.sectionManager.register('product', _product.default);
+    }
+  }]);
+
+  return ProductRenderer;
+}(_base.default);
+
+exports.default = ProductRenderer;
+
+},{"../sections/product":26,"./base":16}],22:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -2452,14 +2607,24 @@ var AJAXCartSection = /*#__PURE__*/function (_BaseSection) {
   }
 
   _createClass(AJAXCartSection, [{
+    key: "open",
+    value: function open() {
+      this.ajaxCart.open();
+    }
+  }, {
+    key: "close",
+    value: function close() {
+      this.ajaxCart.close();
+    }
+  }, {
     key: "onSelect",
     value: function onSelect() {
-      this.ajaxCart.open();
+      this.open();
     }
   }, {
     key: "onDeselect",
     value: function onDeselect() {
-      this.ajaxCart.close();
+      this.close();
     }
   }, {
     key: "onUnload",
@@ -2474,7 +2639,7 @@ var AJAXCartSection = /*#__PURE__*/function (_BaseSection) {
 
 exports.default = AJAXCartSection;
 
-},{"../components/ajaxCart":1,"../core/ajaxFormManager":8,"../core/cartAPI":11,"./base":17,"jquery":27}],17:[function(require,module,exports){
+},{"../components/ajaxCart":1,"../core/ajaxFormManager":8,"../core/cartAPI":11,"./base":23,"jquery":30}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2513,7 +2678,7 @@ var BaseSection = /*#__PURE__*/function () {
   _createClass(BaseSection, [{
     key: "onUnload",
     value: function onUnload(e) {
-      console.log('unload - ' + this.name);
+      console.log("Unloading \"".concat(this.name, "\""));
     }
   }, {
     key: "onSelect",
@@ -2537,7 +2702,7 @@ var BaseSection = /*#__PURE__*/function () {
 
 exports.default = BaseSection;
 
-},{"jquery":27}],18:[function(require,module,exports){
+},{"jquery":30}],24:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -2595,7 +2760,7 @@ var CollectionSection = /*#__PURE__*/function (_BaseSection) {
 
 exports.default = CollectionSection;
 
-},{"../components/product/productCard":2,"./base":17,"jquery":27}],19:[function(require,module,exports){
+},{"../components/product/productCard":2,"./base":23,"jquery":30}],25:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -2672,7 +2837,7 @@ var HeaderSection = /*#__PURE__*/function (_BaseSection) {
 
 exports.default = HeaderSection;
 
-},{"../components/ajaxCart":1,"./base":17,"jquery":27}],20:[function(require,module,exports){
+},{"../components/ajaxCart":1,"./base":23,"jquery":30}],26:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -2729,12 +2894,12 @@ var ProductSection = /*#__PURE__*/function (_BaseSection) {
 
 exports.default = ProductSection;
 
-},{"../components/product/productDetailForm":3,"../components/product/productDetailGallery":4,"./base":17,"jquery":27}],21:[function(require,module,exports){
+},{"../components/product/productDetailForm":3,"../components/product/productDetailGallery":4,"./base":23,"jquery":30}],27:[function(require,module,exports){
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 var _jquery = _interopRequireDefault(require("jquery"));
+
+var _highway = _interopRequireDefault(require("@dogstudio/highway"));
 
 var _throttleDebounce = require("throttle-debounce");
 
@@ -2742,17 +2907,21 @@ var _utils = require("./core/utils");
 
 var _a11y = require("./core/a11y");
 
-var _appController = _interopRequireDefault(require("./core/appController"));
+var _animations = require("./core/animations");
 
-var Animations = _interopRequireWildcard(require("./core/animations"));
+var _breakpoints = require("./core/breakpoints");
 
-var _product = _interopRequireDefault(require("./views/product"));
+var _index = _interopRequireDefault(require("./renderers/index"));
 
-var _collection = _interopRequireDefault(require("./views/collection"));
+var _product = _interopRequireDefault(require("./renderers/product"));
 
-var _page = _interopRequireDefault(require("./views/page"));
+var _collection = _interopRequireDefault(require("./renderers/collection"));
 
-var _index = _interopRequireDefault(require("./views/index"));
+var _page = _interopRequireDefault(require("./renderers/page"));
+
+var _pageCustom = _interopRequireDefault(require("./renderers/pageCustom"));
+
+var _fadeTransition = _interopRequireDefault(require("./transitions/fadeTransition"));
 
 var _sectionManager = _interopRequireDefault(require("./core/sectionManager"));
 
@@ -2760,14 +2929,11 @@ var _header = _interopRequireDefault(require("./sections/header"));
 
 var _ajaxCart = _interopRequireDefault(require("./sections/ajaxCart"));
 
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Core
-// Views
+// Renderers
+// Transitions
 // Sections
 var setViewportHeightProperty = function setViewportHeightProperty() {
   // If mobile / tablet, set var to window height. This fixes the 100vh iOS bug/feature.
@@ -2776,51 +2942,75 @@ var setViewportHeightProperty = function setViewportHeightProperty() {
 };
 
 var $body = (0, _jquery.default)(document.body);
-Animations.initialize();
+var TEMPLATE_REGEX = /(^|\s)template-\S+/g;
+(0, _animations.initialize)();
+(0, _breakpoints.initialize)();
 
 (function () {
   var sectionManager = new _sectionManager.default();
   sectionManager.register('header', _header.default);
-  sectionManager.register('ajax-cart', _ajaxCart.default);
-  var appController = new _appController.default({
-    viewConstructors: {
-      product: _product.default,
+  sectionManager.register('ajax-cart', _ajaxCart.default); // Get back the instances for use in callbacks
+
+  var header = sectionManager.getSingleInstance('header');
+  var ajaxCart = sectionManager.getSingleInstance('ajax-cart'); // START Highway
+
+  var highway = new _highway.default.Core({
+    renderers: {
+      index: _index.default,
       collection: _collection.default,
+      product: _product.default,
       page: _page.default,
-      index: _index.default
+      'page-custom': _pageCustom.default
     },
-    onSameRoute: function onSameRoute(url, currentView) {},
-    onInitialViewReady: function onInitialViewReady(view) {
-      console.log('onInitialViewReady');
-    },
-    onBeforeRouteStart: function onBeforeRouteStart(deferred) {
-      console.log('onBeforeRouteStart'); // sections.ajaxCart.close();
-
-      deferred.resolve();
-    },
-    onRouteStart: function onRouteStart(url) {
-      console.log('onRouteStart');
-    },
-    onViewChangeStart: function onViewChangeStart(url, newView) {
-      console.log('onViewChangeStart');
-    },
-    onViewTransitionOutDone: function onViewTransitionOutDone(url, deferred) {
-      console.log('onViewTransitionOutDone');
-      window.scrollTo && window.scrollTo(0, 0);
-      deferred.resolve();
-    },
-    onViewChangeComplete: function onViewChangeComplete(newView) {
-      console.log('onViewChangeComplete');
-    },
-    onViewReady: function onViewReady(view) {
-      console.log('onViewReady'); // console.log(view);
-
-      if (view.type === 'index') {//
-      } else if (view.type === 'cart') {// sections.ajaxCart.open();
-      }
+    transitions: {
+      default: _fadeTransition.default
     }
-  });
-  appController.start();
+  }); // Prevent highway js from running inside the theme editor
+
+  if ((0, _utils.isThemeEditor)()) {
+    highway.detach(document.querySelectorAll('a'));
+  } // Listen the `NAVIGATE_IN` event
+  // This event is sent everytime a `data-router-view` is added to the DOM Tree
+
+
+  highway.on('NAVIGATE_IN', function (_ref) {
+    var to = _ref.to,
+        trigger = _ref.trigger,
+        location = _ref.location;
+    $body.removeClass(function (i, currentClasses) {
+      return currentClasses.split(' ').map(function (c) {
+        return c.match(TEMPLATE_REGEX);
+      }).join(' ');
+    });
+    $body.addClass(function () {
+      return to.page.body.classList.value.split(' ').map(function (c) {
+        return c.match(TEMPLATE_REGEX);
+      }).join(' ');
+    });
+  }); // Listen the `NAVIGATE_OUT` event
+  // This event is sent everytime the `out()` method of a transition is run to hide a `data-router-view`
+
+  highway.on('NAVIGATE_OUT', function (_ref2) {
+    var from = _ref2.from,
+        trigger = _ref2.trigger,
+        location = _ref2.location;
+    window.scrollTo && window.scrollTo(0, 0);
+    ajaxCart.close();
+  }); // Listen the `NAVIGATE_END` event
+  // This event is sent everytime the `done()` method is called in the `in()` method of a transition
+
+  highway.on('NAVIGATE_END', function (_ref3) {
+    var to = _ref3.to,
+        from = _ref3.from,
+        trigger = _ref3.trigger,
+        location = _ref3.location;
+    var view = to.view.dataset.routerView;
+
+    if (view === 'cart') {
+      ajaxCart.open();
+    }
+  }); // END Highway
+
   (0, _jquery.default)('.in-page-link').on('click', function (evt) {
     return (0, _a11y.pageLinkFocus)((0, _jquery.default)(evt.currentTarget.hash));
   }); // Common a11y fixes
@@ -2833,39 +3023,28 @@ Animations.initialize();
     setViewportHeightProperty();
   }));
   setViewportHeightProperty();
-  $body.addClass('is-loaded'); // Stop here...no AJAX navigation inside the theme editor
-  // eslint-disable-next-line no-undef
 
-  if ((0, _utils.isThemeEditor)()) {
-    return;
+  if (window.history && window.history.scrollRestoration) {
+    // Prevents browser from restoring scroll position when hitting the back button
+    window.history.scrollRestoration = 'manual';
   }
 
-  if (window.history && window.history.pushState) {
-    $body.on('click', 'a', function (e) {
-      if (e.isDefaultPrevented()) return true;
-      var url = (0, _jquery.default)(e.currentTarget).attr('href');
-      if ((0, _utils.isExternal)(url) || url === '#' || url.indexOf('/checkout') > -1) return true;
-      if (appController.isTransitioning) return false;
-      e.preventDefault();
-      appController.navigate(url);
-      return true;
-    }); // Prevents browser from restoring scroll position when hitting the back button
-
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
-    }
-  }
+  $body.addClass('is-loaded');
 })();
 
-},{"./core/a11y":7,"./core/animations":9,"./core/appController":10,"./core/sectionManager":14,"./core/utils":15,"./sections/ajaxCart":16,"./sections/header":19,"./views/collection":23,"./views/index":24,"./views/page":25,"./views/product":26,"jquery":27,"throttle-debounce":29}],22:[function(require,module,exports){
+},{"./core/a11y":7,"./core/animations":9,"./core/breakpoints":10,"./core/sectionManager":14,"./core/utils":15,"./renderers/collection":17,"./renderers/index":18,"./renderers/page":19,"./renderers/pageCustom":20,"./renderers/product":21,"./sections/ajaxCart":22,"./sections/header":25,"./transitions/fadeTransition":28,"@dogstudio/highway":29,"jquery":30,"throttle-debounce":31}],28:[function(require,module,exports){
 "use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
 
-var _sectionManager = _interopRequireDefault(require("../core/sectionManager"));
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _highway = _interopRequireDefault(require("@dogstudio/highway"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2875,228 +3054,89 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var BaseView = /*#__PURE__*/function () {
-  function BaseView($el, type) {
-    _classCallCheck(this, BaseView);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-    this.$el = $el;
-    this.type = type;
-    this.sectionManager = new _sectionManager.default();
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var FadeTransition = /*#__PURE__*/function (_Highway$Transition) {
+  _inherits(FadeTransition, _Highway$Transition);
+
+  var _super = _createSuper(FadeTransition);
+
+  function FadeTransition() {
+    _classCallCheck(this, FadeTransition);
+
+    return _super.apply(this, arguments);
   }
 
-  _createClass(BaseView, [{
-    key: "destroy",
-    value: function destroy() {
-      this.sectionManager.destroy();
+  _createClass(FadeTransition, [{
+    key: "in",
+    value: function _in(_ref) {
+      var from = _ref.from,
+          to = _ref.to,
+          trigger = _ref.trigger,
+          done = _ref.done;
+      (0, _jquery.default)(from).remove();
+      (0, _jquery.default)(to).hide().fadeIn({
+        duration: 400,
+        easing: 'easeInOutCubic',
+        complete: function complete() {
+          return done();
+        }
+      });
+    }
+  }, {
+    key: "out",
+    value: function out(_ref2) {
+      var from = _ref2.from,
+          trigger = _ref2.trigger,
+          done = _ref2.done;
+      (0, _jquery.default)(from).fadeOut(function () {
+        return done();
+      });
     }
   }]);
 
-  return BaseView;
-}();
+  return FadeTransition;
+}(_highway.default.Transition);
+/*
+  This *sortof* works but was causing some pages to reload
 
-exports.default = BaseView;
-
-},{"../core/sectionManager":14}],23:[function(require,module,exports){
-"use strict";
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _base = _interopRequireDefault(require("./base"));
-
-var _collection = _interopRequireDefault(require("../sections/collection"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-var CollectionView = /*#__PURE__*/function (_BaseView) {
-  _inherits(CollectionView, _BaseView);
-
-  var _super = _createSuper(CollectionView);
-
-  function CollectionView($el, type) {
-    var _this;
-
-    _classCallCheck(this, CollectionView);
-
-    _this = _super.call(this, $el, type);
-
-    _this.sectionManager.register('collection', _collection.default);
-
-    return _this;
+  in({ from, to, trigger, done }) {
+    console.log('in')
+    $(to).addClass('transition-in')
+    setTimeout(() => $(to).addClass('transition-in-active'), 30)
+    setTimeout(() => {
+      $(to).removeClass('transition-in transition-in-active');
+      $(from).remove()
+    }, 330)
   }
 
-  return CollectionView;
-}(_base.default);
-
-exports.default = CollectionView;
-
-},{"../sections/collection":18,"./base":22}],24:[function(require,module,exports){
-"use strict";
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _base = _interopRequireDefault(require("./base"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-var IndexView = /*#__PURE__*/function (_BaseView) {
-  _inherits(IndexView, _BaseView);
-
-  var _super = _createSuper(IndexView);
-
-  function IndexView($el, type) {
-    _classCallCheck(this, IndexView);
-
-    return _super.call(this, $el, type);
+  out({ from, trigger, done }) {
+    console.log('out')
+    $(from).addClass('transition-out');
+    done()
   }
+  */
 
-  return IndexView;
-}(_base.default);
 
-exports.default = IndexView;
+exports.default = FadeTransition;
 
-},{"./base":22}],25:[function(require,module,exports){
-"use strict";
+},{"@dogstudio/highway":29,"jquery":30}],29:[function(require,module,exports){
+function t(){}t.prototype={on:function(t,e,r){var i=this.e||(this.e={});return(i[t]||(i[t]=[])).push({fn:e,ctx:r}),this},once:function(t,e,r){var i=this;function n(){i.off(t,n),e.apply(r,arguments)}return n._=e,this.on(t,n,r)},emit:function(t){for(var e=[].slice.call(arguments,1),r=((this.e||(this.e={}))[t]||[]).slice(),i=0,n=r.length;i<n;i++)r[i].fn.apply(r[i].ctx,e);return this},off:function(t,e){var r=this.e||(this.e={}),i=r[t],n=[];if(i&&e)for(var o=0,s=i.length;o<s;o++)i[o].fn!==e&&i[o].fn._!==e&&n.push(i[o]);return n.length?r[t]=n:delete r[t],this}};var e=t;e.TinyEmitter=t;var r=function(t){this.wrap=document.querySelector("[data-router-wrapper]"),this.properties=t,this.Transition=t.transition?new t.transition.class(this.wrap,t.transition.name):null};r.prototype.setup=function(){this.onEnter&&this.onEnter(),this.onEnterCompleted&&this.onEnterCompleted()},r.prototype.add=function(){this.wrap.insertAdjacentHTML("beforeend",this.properties.view.outerHTML)},r.prototype.update=function(){document.title=this.properties.page.title},r.prototype.show=function(t){var e=this;return new Promise(function(r){try{function i(t){e.onEnterCompleted&&e.onEnterCompleted(),r()}return e.update(),e.onEnter&&e.onEnter(),Promise.resolve(e.Transition?Promise.resolve(e.Transition.show(t)).then(i):i())}catch(t){return Promise.reject(t)}})},r.prototype.hide=function(t){var e=this;return new Promise(function(r){try{function i(t){e.onLeaveCompleted&&e.onLeaveCompleted(),r()}return e.onLeave&&e.onLeave(),Promise.resolve(e.Transition?Promise.resolve(e.Transition.hide(t)).then(i):i())}catch(t){return Promise.reject(t)}})};var i=new window.DOMParser,n=function(t,e){this.renderers=t,this.transitions=e};n.prototype.getOrigin=function(t){var e=t.match(/(https?:\/\/[\w\-.]+)/);return e?e[1].replace(/https?:\/\//,""):null},n.prototype.getPathname=function(t){var e=t.match(/https?:\/\/.*?(\/[\w_\-./]+)/);return e?e[1]:"/"},n.prototype.getAnchor=function(t){var e=t.match(/(#.*)$/);return e?e[1]:null},n.prototype.getParams=function(t){var e=t.match(/\?([\w_\-.=&]+)/);if(!e)return null;for(var r=e[1].split("&"),i={},n=0;n<r.length;n++){var o=r[n].split("=");i[o[0]]=o[1]}return i},n.prototype.getDOM=function(t){return"string"==typeof t?i.parseFromString(t,"text/html"):t},n.prototype.getView=function(t){return t.querySelector("[data-router-view]")},n.prototype.getSlug=function(t){return t.getAttribute("data-router-view")},n.prototype.getRenderer=function(t){if(!this.renderers)return Promise.resolve(r);if(t in this.renderers){var e=this.renderers[t];return"function"!=typeof e||r.isPrototypeOf(e)?"function"==typeof e.then?Promise.resolve(e).then(function(t){return t.default}):Promise.resolve(e):Promise.resolve(e()).then(function(t){return t.default})}return Promise.resolve(r)},n.prototype.getTransition=function(t){return this.transitions?t in this.transitions?{class:this.transitions[t],name:t}:"default"in this.transitions?{class:this.transitions.default,name:"default"}:null:null},n.prototype.getProperties=function(t){var e=this.getDOM(t),r=this.getView(e),i=this.getSlug(r);return{page:e,view:r,slug:i,renderer:this.getRenderer(i,this.renderers),transition:this.getTransition(i,this.transitions)}},n.prototype.getLocation=function(t){return{href:t,anchor:this.getAnchor(t),origin:this.getOrigin(t),params:this.getParams(t),pathname:this.getPathname(t)}};var o=function(t){function e(e){var r=this;void 0===e&&(e={});var i=e.renderers,o=e.transitions;t.call(this),this.Helpers=new n(i,o),this.Transitions=o,this.Contextual=!1,this.location=this.Helpers.getLocation(window.location.href),this.properties=this.Helpers.getProperties(document.cloneNode(!0)),this.popping=!1,this.running=!1,this.trigger=null,this.cache=new Map,this.cache.set(this.location.href,this.properties),this.properties.renderer.then(function(t){r.From=new t(r.properties),r.From.setup()}),this._navigate=this.navigate.bind(this),window.addEventListener("popstate",this.popState.bind(this)),this.links=document.querySelectorAll("a:not([target]):not([data-router-disabled])"),this.attach(this.links)}return t&&(e.__proto__=t),(e.prototype=Object.create(t&&t.prototype)).constructor=e,e.prototype.attach=function(t){for(var e=0,r=t;e<r.length;e+=1)r[e].addEventListener("click",this._navigate)},e.prototype.detach=function(t){for(var e=0,r=t;e<r.length;e+=1)r[e].removeEventListener("click",this._navigate)},e.prototype.navigate=function(t){if(!t.metaKey&&!t.ctrlKey){t.preventDefault();var e=!!t.currentTarget.hasAttribute("data-transition")&&t.currentTarget.dataset.transition;this.redirect(t.currentTarget.href,e,t.currentTarget)}},e.prototype.redirect=function(t,e,r){if(void 0===e&&(e=!1),void 0===r&&(r="script"),this.trigger=r,!this.running&&t!==this.location.href){var i=this.Helpers.getLocation(t);this.Contextual=!1,e&&(this.Contextual=this.Transitions[e].prototype,this.Contextual.name=e),i.origin!==this.location.origin||i.anchor&&i.pathname===this.location.pathname?window.location.href=t:(this.location=i,this.beforeFetch())}},e.prototype.popState=function(){this.trigger="popstate",this.Contextual=!1;var t=this.Helpers.getLocation(window.location.href);this.location.pathname!==t.pathname||!this.location.anchor&&!t.anchor?(this.popping=!0,this.location=t,this.beforeFetch()):this.location=t},e.prototype.pushState=function(){this.popping||window.history.pushState(this.location,"",this.location.href)},e.prototype.fetch=function(){try{var t=this;return Promise.resolve(fetch(t.location.href,{mode:"same-origin",method:"GET",headers:{"X-Requested-With":"Highway"},credentials:"same-origin"})).then(function(e){if(e.status>=200&&e.status<300)return e.text();window.location.href=t.location.href})}catch(t){return Promise.reject(t)}},e.prototype.beforeFetch=function(){try{var t=this;function e(){t.afterFetch()}t.pushState(),t.running=!0,t.emit("NAVIGATE_OUT",{from:{page:t.From.properties.page,view:t.From.properties.view},trigger:t.trigger,location:t.location});var r={trigger:t.trigger,contextual:t.Contextual},i=t.cache.has(t.location.href)?Promise.resolve(t.From.hide(r)).then(function(){t.properties=t.cache.get(t.location.href)}):Promise.resolve(Promise.all([t.fetch(),t.From.hide(r)])).then(function(e){t.properties=t.Helpers.getProperties(e[0]),t.cache.set(t.location.href,t.properties)});return Promise.resolve(i&&i.then?i.then(e):e())}catch(t){return Promise.reject(t)}},e.prototype.afterFetch=function(){try{var t=this;return Promise.resolve(t.properties.renderer).then(function(e){return t.To=new e(t.properties),t.To.add(),t.emit("NAVIGATE_IN",{to:{page:t.To.properties.page,view:t.To.wrap.lastElementChild},trigger:t.trigger,location:t.location}),Promise.resolve(t.To.show({trigger:t.trigger,contextual:t.Contextual})).then(function(){t.popping=!1,t.running=!1,t.detach(t.links),t.links=document.querySelectorAll("a:not([target]):not([data-router-disabled])"),t.attach(t.links),t.emit("NAVIGATE_END",{to:{page:t.To.properties.page,view:t.To.wrap.lastElementChild},from:{page:t.From.properties.page,view:t.From.properties.view},trigger:t.trigger,location:t.location}),t.From=t.To,t.trigger=null})})}catch(t){return Promise.reject(t)}},e}(e),s=function(t,e){this.wrap=t,this.name=e};s.prototype.show=function(t){var e=this,r=t.trigger,i=t.contextual,n=this.wrap.lastElementChild,o=this.wrap.firstElementChild;return new Promise(function(t){i?(n.setAttribute("data-transition-in",i.name),n.removeAttribute("data-transition-out",i.name),i.in&&i.in({to:n,from:o,trigger:r,done:t})):(n.setAttribute("data-transition-in",e.name),n.removeAttribute("data-transition-out",e.name),e.in&&e.in({to:n,from:o,trigger:r,done:t}))})},s.prototype.hide=function(t){var e=this,r=t.trigger,i=t.contextual,n=this.wrap.firstElementChild;return new Promise(function(t){i?(n.setAttribute("data-transition-out",i.name),n.removeAttribute("data-transition-in",i.name),i.out&&i.out({from:n,trigger:r,done:t})):(n.setAttribute("data-transition-out",e.name),n.removeAttribute("data-transition-in",e.name),e.out&&e.out({from:n,trigger:r,done:t}))})},console.log("Highway v2.2.0"),module.exports={Core:o,Helpers:n,Renderer:r,Transition:s};
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _base = _interopRequireDefault(require("./base"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-var PageView = /*#__PURE__*/function (_BaseView) {
-  _inherits(PageView, _BaseView);
-
-  var _super = _createSuper(PageView);
-
-  function PageView($el, type) {
-    _classCallCheck(this, PageView);
-
-    return _super.call(this, $el, type);
-  }
-
-  return PageView;
-}(_base.default);
-
-exports.default = PageView;
-
-},{"./base":22}],26:[function(require,module,exports){
-"use strict";
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _base = _interopRequireDefault(require("./base"));
-
-var _product = _interopRequireDefault(require("../sections/product"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-var ProductView = /*#__PURE__*/function (_BaseView) {
-  _inherits(ProductView, _BaseView);
-
-  var _super = _createSuper(ProductView);
-
-  function ProductView($el, type) {
-    var _this;
-
-    _classCallCheck(this, ProductView);
-
-    _this = _super.call(this, $el, type);
-
-    _this.sectionManager.register('product', _product.default);
-
-    return _this;
-  }
-
-  return ProductView;
-}(_base.default);
-
-exports.default = ProductView;
-
-},{"../sections/product":20,"./base":22}],27:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.6.0
  * https://jquery.com/
@@ -13979,10 +14019,7 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
-},{}],28:[function(require,module,exports){
-!function(t,n){"object"==typeof exports&&"object"==typeof module?module.exports=n():"function"==typeof define&&define.amd?define("Navigo",[],n):"object"==typeof exports?exports.Navigo=n():t.Navigo=n()}("undefined"!=typeof self?self:this,(function(){return(()=>{"use strict";var t={407:(t,n,e)=>{e.d(n,{default:()=>N});var o=/([:*])(\w+)/g,r=/\*/g,i=/\/\?/g;function a(t){return void 0===t&&(t="/"),v()?location.pathname+location.search+location.hash:t}function s(t){return t.replace(/\/+$/,"").replace(/^\/+/,"")}function c(t){return"string"==typeof t}function u(t){return t&&t.indexOf("#")>=0&&t.split("#").pop()||""}function h(t){var n=s(t).split(/\?(.*)?$/);return[s(n[0]),n.slice(1).join("")]}function f(t){for(var n={},e=t.split("&"),o=0;o<e.length;o++){var r=e[o].split("=");if(""!==r[0]){var i=decodeURIComponent(r[0]);n[i]?(Array.isArray(n[i])||(n[i]=[n[i]]),n[i].push(decodeURIComponent(r[1]||""))):n[i]=decodeURIComponent(r[1]||"")}}return n}function l(t,n){var e,a=h(s(t.currentLocationPath)),l=a[0],p=a[1],d=""===p?null:f(p),v=[];if(c(n.path)){if(e="(?:/^|^)"+s(n.path).replace(o,(function(t,n,e){return v.push(e),"([^/]+)"})).replace(r,"?(?:.*)").replace(i,"/?([^/]+|)")+"$",""===s(n.path)&&""===s(l))return{url:l,queryString:p,hashString:u(t.to),route:n,data:null,params:d}}else e=n.path;var g=new RegExp(e,""),m=l.match(g);if(m){var y=c(n.path)?function(t,n){return 0===n.length?null:t?t.slice(1,t.length).reduce((function(t,e,o){return null===t&&(t={}),t[n[o]]=decodeURIComponent(e),t}),null):null}(m,v):m.groups?m.groups:m.slice(1);return{url:s(l.replace(new RegExp("^"+t.instance.root),"")),queryString:p,hashString:u(t.to),route:n,data:y,params:d}}return!1}function p(){return!("undefined"==typeof window||!window.history||!window.history.pushState)}function d(t,n){return void 0===t[n]||!0===t[n]}function v(){return"undefined"!=typeof window}function g(t,n){return void 0===t&&(t=[]),void 0===n&&(n={}),t.filter((function(t){return t})).forEach((function(t){["before","after","already","leave"].forEach((function(e){t[e]&&(n[e]||(n[e]=[]),n[e].push(t[e]))}))})),n}function m(t,n,e){var o=n||{},r=0;!function n(){t[r]?Array.isArray(t[r])?(t.splice.apply(t,[r,1].concat(t[r][0](o)?t[r][1]:t[r][2])),n()):t[r](o,(function(t){void 0===t||!0===t?(r+=1,n()):e&&e(o)})):e&&e(o)}()}function y(t,n){void 0===t.currentLocationPath&&(t.currentLocationPath=t.to=a(t.instance.root)),t.currentLocationPath=t.instance._checkForAHash(t.currentLocationPath),n()}function _(t,n){for(var e=0;e<t.instance.routes.length;e++){var o=l(t,t.instance.routes[e]);if(o&&(t.matches||(t.matches=[]),t.matches.push(o),"ONE"===t.resolveOptions.strategy))return void n()}n()}function O(t,n){t.navigateOptions&&(void 0!==t.navigateOptions.shouldResolve&&console.warn('"shouldResolve" is deprecated. Please check the documentation.'),void 0!==t.navigateOptions.silent&&console.warn('"silent" is deprecated. Please check the documentation.')),n()}function k(t,n){!0===t.navigateOptions.force?(t.instance._setCurrent([t.instance._pathToMatchObject(t.to)]),n(!1)):n()}m.if=function(t,n,e){return Array.isArray(n)||(n=[n]),Array.isArray(e)||(e=[e]),[t,n,e]};var w=v(),L=p();function b(t,n){if(d(t.navigateOptions,"updateBrowserURL")){var e=("/"+t.to).replace(/\/\//g,"/"),o=w&&t.resolveOptions&&!0===t.resolveOptions.hash;L?(history[t.navigateOptions.historyAPIMethod||"pushState"](t.navigateOptions.stateObj||{},t.navigateOptions.title||"",o?"#"+e:e),location&&location.hash&&(t.instance.__freezeListening=!0,setTimeout((function(){var n=location.hash;location.hash="",location.hash=n,t.instance.__freezeListening=!1}),1))):w&&(window.location.href=t.to)}n()}function P(t,n){var e=t.instance;e.lastResolved()?m(e.lastResolved().map((function(n){return function(e,o){if(n.route.hooks&&n.route.hooks.leave){var r=!1,i=t.instance.matchLocation(n.route.path,t.currentLocationPath,!1);r="*"!==n.route.path?!i:!(t.matches&&t.matches.find((function(t){return n.route.path===t.route.path}))),d(t.navigateOptions,"callHooks")&&r?m(n.route.hooks.leave.map((function(n){return function(e,o){return n((function(n){!1===n?t.instance.__dirty=!1:o()}),t.matches&&t.matches.length>0?1===t.matches.length?t.matches[0]:t.matches:void 0)}})).concat([function(){return o()}])):o()}else o()}})),{},(function(){return n()})):n()}function A(t,n){d(t.navigateOptions,"updateState")&&t.instance._setCurrent(t.matches),n()}var R=[function(t,n){var e=t.instance.lastResolved();if(e&&e[0]&&e[0].route===t.match.route&&e[0].url===t.match.url&&e[0].queryString===t.match.queryString)return e.forEach((function(n){n.route.hooks&&n.route.hooks.already&&d(t.navigateOptions,"callHooks")&&n.route.hooks.already.forEach((function(n){return n(t.match)}))})),void n(!1);n()},function(t,n){t.match.route.hooks&&t.match.route.hooks.before&&d(t.navigateOptions,"callHooks")?m(t.match.route.hooks.before.map((function(n){return function(e,o){return n((function(n){!1===n?t.instance.__dirty=!1:o()}),t.match)}})).concat([function(){return n()}])):n()},function(t,n){d(t.navigateOptions,"callHandler")&&t.match.route.handler(t.match),t.instance.updatePageLinks(),n()},function(t,n){t.match.route.hooks&&t.match.route.hooks.after&&d(t.navigateOptions,"callHooks")&&t.match.route.hooks.after.forEach((function(n){return n(t.match)})),n()}],E=[P,function(t,n){var e=t.instance._notFoundRoute;if(e){t.notFoundHandled=!0;var o=h(t.currentLocationPath),r=o[0],i=o[1],a=u(t.to);e.path=s(r);var c={url:e.path,queryString:i,hashString:a,data:null,route:e,params:""!==i?f(i):null};t.matches=[c],t.match=c}n()},m.if((function(t){return t.notFoundHandled}),R.concat([A]),[function(t,n){t.resolveOptions&&!1!==t.resolveOptions.noMatchWarning&&void 0!==t.resolveOptions.noMatchWarning||console.warn('Navigo: "'+t.currentLocationPath+"\" didn't match any of the registered routes."),n()},function(t,n){t.instance._setCurrent(null),n()}])];function S(){return(S=Object.assign||function(t){for(var n=1;n<arguments.length;n++){var e=arguments[n];for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&(t[o]=e[o])}return t}).apply(this,arguments)}function H(t,n){var e=0;P(t,(function o(){e!==t.matches.length?m(R,S({},t,{match:t.matches[e]}),(function(){e+=1,o()})):A(t,n)}))}function x(t){t.instance.__dirty=!1,t.instance.__waiting.length>0&&t.instance.__waiting.shift()()}function j(){return(j=Object.assign||function(t){for(var n=1;n<arguments.length;n++){var e=arguments[n];for(var o in e)Object.prototype.hasOwnProperty.call(e,o)&&(t[o]=e[o])}return t}).apply(this,arguments)}function N(t,n){var e,o=n||{strategy:"ONE",hash:!1,noMatchWarning:!1},r=this,i="/",d=null,w=[],L=!1,P=p(),A=v();function R(t){return t.indexOf("#")>=0&&(t=!0===o.hash?t.split("#")[1]||"/":t.split("#")[0]),t}function S(t){return s(i+"/"+s(t))}function N(t,n,e,o){return t=c(t)?S(t):t,{name:o||s(String(t)),path:t,handler:n,hooks:g(e)}}function C(t,n){if(!r.__dirty){r.__dirty=!0,t=t?s(i)+"/"+s(t):void 0;var e={instance:r,to:t,currentLocationPath:t,navigateOptions:{},resolveOptions:j({},o,n)};return m([y,_,m.if((function(t){var n=t.matches;return n&&n.length>0}),H,E)],e,x),!!e.matches&&e.matches}r.__waiting.push((function(){return r.resolve(t,n)}))}function U(t,n){if(r.__dirty)r.__waiting.push((function(){return r.navigate(t,n)}));else{r.__dirty=!0,t=s(i)+"/"+s(t);var e={instance:r,to:t,navigateOptions:n||{},resolveOptions:n&&n.resolveOptions?n.resolveOptions:o,currentLocationPath:R(t)};m([O,k,_,m.if((function(t){var n=t.matches;return n&&n.length>0}),H,E),b,x],e,x)}}function q(){if(A)return(A?[].slice.call(document.querySelectorAll("[data-navigo]")):[]).forEach((function(t){"false"!==t.getAttribute("data-navigo")&&"_blank"!==t.getAttribute("target")?t.hasListenerAttached||(t.hasListenerAttached=!0,t.navigoHandler=function(n){if((n.ctrlKey||n.metaKey)&&"a"===n.target.tagName.toLowerCase())return!1;var e=t.getAttribute("href");if(null==e)return!1;if(e.match(/^(http|https)/)&&"undefined"!=typeof URL)try{var o=new URL(e);e=o.pathname+o.search}catch(t){}var i=function(t){if(!t)return{};var n,e=t.split(","),o={};return e.forEach((function(t){var e=t.split(":").map((function(t){return t.replace(/(^ +| +$)/g,"")}));switch(e[0]){case"historyAPIMethod":o.historyAPIMethod=e[1];break;case"resolveOptionsStrategy":n||(n={}),n.strategy=e[1];break;case"resolveOptionsHash":n||(n={}),n.hash="true"===e[1];break;case"updateBrowserURL":case"callHandler":case"updateState":case"force":o[e[0]]="true"===e[1]}})),n&&(o.resolveOptions=n),o}(t.getAttribute("data-navigo-options"));L||(n.preventDefault(),n.stopPropagation(),r.navigate(s(e),i))},t.addEventListener("click",t.navigoHandler)):t.hasListenerAttached&&t.removeEventListener("click",t.navigoHandler)})),r}function F(t,n,e){var o=w.find((function(n){return n.name===t})),r=null;if(o){if(r=o.path,n)for(var a in n)r=r.replace(":"+a,n[a]);r=r.match(/^\//)?r:"/"+r}return r&&e&&!e.includeRoot&&(r=r.replace(new RegExp("^/"+i),"")),r}function I(t){var n=h(s(t)),o=n[0],r=n[1],i=""===r?null:f(r);return{url:o,queryString:r,hashString:u(t),route:N(o,(function(){}),[e],o),data:null,params:i}}function M(t,n,e){return"string"==typeof n&&(n=T(n)),n?(n.hooks[t]||(n.hooks[t]=[]),n.hooks[t].push(e),function(){n.hooks[t]=n.hooks[t].filter((function(t){return t!==e}))}):(console.warn("Route doesn't exists: "+n),function(){})}function T(t){return"string"==typeof t?w.find((function(n){return n.name===S(t)})):w.find((function(n){return n.handler===t}))}t?i=s(t):console.warn('Navigo requires a root path in its constructor. If not provided will use "/" as default.'),this.root=i,this.routes=w,this.destroyed=L,this.current=d,this.__freezeListening=!1,this.__waiting=[],this.__dirty=!1,this.on=function(t,n,o){var r=this;return"object"!=typeof t||t instanceof RegExp?("function"==typeof t&&(o=n,n=t,t=i),w.push(N(t,n,[e,o])),this):(Object.keys(t).forEach((function(n){if("function"==typeof t[n])r.on(n,t[n]);else{var o=t[n],i=o.uses,a=o.as,s=o.hooks;w.push(N(n,i,[e,s],a))}})),this)},this.off=function(t){return this.routes=w=w.filter((function(n){return c(t)?s(n.path)!==s(t):"function"==typeof t?t!==n.handler:String(n.path)!==String(t)})),this},this.resolve=C,this.navigate=U,this.navigateByName=function(t,n,e){var o=F(t,n);return null!==o&&(U(o,e),!0)},this.destroy=function(){this.routes=w=[],P&&window.removeEventListener("popstate",this.__popstateListener),this.destroyed=L=!0},this.notFound=function(t,n){return r._notFoundRoute=N("*",t,[e,n],"__NOT_FOUND__"),this},this.updatePageLinks=q,this.link=function(t){return"/"+i+"/"+s(t)},this.hooks=function(t){return e=t,this},this.extractGETParameters=function(t){return h(R(t))},this.lastResolved=function(){return d},this.generate=F,this.getLinkPath=function(t){return t.getAttribute("href")},this.match=function(t){var n={instance:r,currentLocationPath:t,to:t,navigateOptions:{},resolveOptions:o};return _(n,(function(){})),!!n.matches&&n.matches},this.matchLocation=function(t,n,e){void 0===n||void 0!==e&&!e||(n=S(n));var o={instance:r,to:n,currentLocationPath:n};return y(o,(function(){})),"string"==typeof t&&(t=void 0===e||e?S(t):t),l(o,{name:String(t),path:t,handler:function(){},hooks:{}})||!1},this.getCurrentLocation=function(){return I(s(a(i)).replace(new RegExp("^"+i),""))},this.addBeforeHook=M.bind(this,"before"),this.addAfterHook=M.bind(this,"after"),this.addAlreadyHook=M.bind(this,"already"),this.addLeaveHook=M.bind(this,"leave"),this.getRoute=T,this._pathToMatchObject=I,this._clean=s,this._checkForAHash=R,this._setCurrent=function(t){return d=r.current=t},function(){P&&(this.__popstateListener=function(){r.__freezeListening||C()},window.addEventListener("popstate",this.__popstateListener))}.call(this),q.call(this)}}},n={};function e(o){if(n[o])return n[o].exports;var r=n[o]={exports:{}};return t[o](r,r.exports,e),r.exports}return e.d=(t,n)=>{for(var o in n)e.o(n,o)&&!e.o(t,o)&&Object.defineProperty(t,o,{enumerable:!0,get:n[o]})},e.o=(t,n)=>Object.prototype.hasOwnProperty.call(t,n),e(407)})().default}));
-
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -14129,4 +14166,4 @@ exports.debounce = debounce;
 exports.throttle = throttle;
 
 
-},{}]},{},[21]);
+},{}]},{},[27]);

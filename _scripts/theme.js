@@ -1,5 +1,6 @@
-import $ from 'jquery'
-import { throttle } from 'throttle-debounce'
+import $ from 'jquery';
+import Highway from '@dogstudio/highway';
+import { throttle } from 'throttle-debounce';
 
 // Core
 import {
@@ -8,14 +9,18 @@ import {
   isExternal
 } from './core/utils'
 import { pageLinkFocus } from './core/a11y'
-import AppController     from './core/appController'
-import * as Animations   from './core/animations'
+import { initialize as initializeAnimations }  from './core/animations'
+import { initialize as initializeBreakpoints } from './core/breakpoints'
 
-// Views
-import ProductView from './views/product'
-import CollectionView from './views/collection'
-import PageView from './views/page'
-import IndexView from './views/index'
+// Renderers
+import IndexRenderer from './renderers/index';
+import ProductRenderer from './renderers/product';
+import CollectionRenderer from './renderers/collection';
+import PageRenderer from './renderers/page';
+import PageCustomRenderer from './renderers/pageCustom';
+
+// Transitions
+import FadeTransition from './transitions/fadeTransition';
 
 // Sections
 import SectionManager from './core/sectionManager'
@@ -29,61 +34,69 @@ const setViewportHeightProperty = () => {
 };
 
 const $body = $(document.body);
+const TEMPLATE_REGEX = /(^|\s)template-\S+/g;
 
-Animations.initialize();
+initializeAnimations();
+initializeBreakpoints();
 
 (() => {
-  const sectionManager = new SectionManager()
+  const sectionManager = new SectionManager();
 
-  sectionManager.register('header', Header)
-  sectionManager.register('ajax-cart', AJAXCart)
+  sectionManager.register('header', Header);
+  sectionManager.register('ajax-cart', AJAXCart);
 
-  const appController = new AppController({
-    viewConstructors: {
-      product: ProductView,
-      collection: CollectionView,
-      page: PageView,
-      index: IndexView
-    },
-    onSameRoute: (url, currentView) => {
-      
-    },
-    onInitialViewReady: (view) => {
-      console.log('onInitialViewReady')
-    },
-    onBeforeRouteStart: (deferred) => {
-      console.log('onBeforeRouteStart')
-      // sections.ajaxCart.close();
-      deferred.resolve();
-    },
-    onRouteStart: (url) => {
-      console.log('onRouteStart');
-    },
-    onViewChangeStart: (url, newView) => {
-      console.log('onViewChangeStart')
-    },
-    onViewTransitionOutDone: (url, deferred) => {
-      console.log('onViewTransitionOutDone')
-      window.scrollTo && window.scrollTo(0, 0)
-      deferred.resolve()
-    },
-    onViewChangeComplete: (newView) => {
-      console.log('onViewChangeComplete')
-    },
-    onViewReady: (view) => {
-      console.log('onViewReady')
-      // console.log(view);
+  // Get back the instances for use in callbacks
+  const header = sectionManager.getSingleInstance('header');
+  const ajaxCart = sectionManager.getSingleInstance('ajax-cart');  
 
-      if (view.type === 'index') {
-        //
-      }
-      else if (view.type === 'cart') {
-        // sections.ajaxCart.open();
-      }
-    }    
-  })
+  // START Highway
+  const highway = new Highway.Core({
+    renderers: {
+      index: IndexRenderer,
+      collection: CollectionRenderer,
+      product: ProductRenderer,
+      page: PageRenderer,
+      'page-custom': PageCustomRenderer
+    },
+    transitions: {
+      default: FadeTransition
+    }
+  });
 
-  appController.start()
+  // Prevent highway js from running inside the theme editor
+  if (isThemeEditor()) {
+    highway.detach(document.querySelectorAll('a'))
+  }  
+
+  // Listen the `NAVIGATE_IN` event
+  // This event is sent everytime a `data-router-view` is added to the DOM Tree
+  highway.on('NAVIGATE_IN', ({ to, trigger, location }) => {
+    $body.removeClass((i, currentClasses) => {
+      return currentClasses.split(' ').map(c => c.match(TEMPLATE_REGEX)).join(' ');
+    });
+
+    $body.addClass(() => {
+      return to.page.body.classList.value.split(' ').map(c => c.match(TEMPLATE_REGEX)).join(' ');
+    });
+  });
+
+  // Listen the `NAVIGATE_OUT` event
+  // This event is sent everytime the `out()` method of a transition is run to hide a `data-router-view`
+  highway.on('NAVIGATE_OUT', ({ from, trigger, location }) => {
+    window.scrollTo && window.scrollTo(0, 0);
+    ajaxCart.close();
+  });
+
+  // Listen the `NAVIGATE_END` event
+  // This event is sent everytime the `done()` method is called in the `in()` method of a transition
+  highway.on('NAVIGATE_END', ({ to, from, trigger, location }) => {
+    const view = to.view.dataset.routerView
+
+    if (view === 'cart') {
+      ajaxCart.open();
+    }
+  });
+  // END Highway
 
   $('.in-page-link').on('click', evt => pageLinkFocus($(evt.currentTarget.hash)));
 
@@ -100,33 +113,10 @@ Animations.initialize();
 
   setViewportHeightProperty();
 
-  $body.addClass('is-loaded');
-
-  // Stop here...no AJAX navigation inside the theme editor
-  // eslint-disable-next-line no-undef
-  if (isThemeEditor()) {
-    return;
-  }
-
-  if (window.history && window.history.pushState) {
-    $body.on('click', 'a', (e) => {
-      if (e.isDefaultPrevented()) return true;
-
-      const url = $(e.currentTarget).attr('href');
-
-      if (isExternal(url) || url === '#' || url.indexOf('/checkout') > -1) return true;
-
-      if (appController.isTransitioning) return false;
-
-      e.preventDefault();
-      appController.navigate(url);
-
-      return true;
-    });
-
+  if (window.history && window.history.scrollRestoration) {
     // Prevents browser from restoring scroll position when hitting the back button
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
-    }
+    window.history.scrollRestoration = 'manual';
   }  
+
+  $body.addClass('is-loaded');  
 })()

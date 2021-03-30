@@ -6,7 +6,7 @@
 //    md
 //    >> breakpoint-next(sm, $breakpoint-names: (xs sm md lg xl))
 //    md
-@function breakpoint-next($name, $breakpoints: $breakpoints, $breakpoint-names: map-keys($breakpoints)) {
+@function breakpoint-next($name, $breakpoints: $grid-breakpoints, $breakpoint-names: map-keys($breakpoints)) {
   $n: index($breakpoint-names, $name);
   @return if($n != null and $n < length($breakpoint-names), nth($breakpoint-names, $n + 1), null);
 }
@@ -15,7 +15,7 @@
 //
 //    >> breakpoint-min(sm, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1480px))
 //    576px
-@function breakpoint-min($name, $breakpoints: $breakpoints) {
+@function breakpoint-min($name, $breakpoints: $grid-breakpoints) {
   $min: map-get($breakpoints, $name);
   @return if($min != 0, $min, null);
 }
@@ -34,9 +34,30 @@
   @return if($next, breakpoint-min($next, $breakpoints) - .02, null);
 }
 
+// Returns a blank string if smallest breakpoint, otherwise returns the name with a dash in front.
+// Useful for making responsive utilities.
+//
+//    >> breakpoint-infix(xs, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1480px))
+//    ""  (Returns a blank string)
+//    >> breakpoint-infix(sm, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1480px))
+//    "-sm"
+@function breakpoint-infix($name, $breakpoints: $grid-breakpoints) {
+  @return if(breakpoint-min($name, $breakpoints) == null, "", "-#{$name}");
+}
+
+// Same as `breakpoint-infix` but places the dash as the end of the name
+//
+//    >> breakpoint-infix-rear(xs, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1480px))
+//    ""  (Returns a blank string)
+//    >> breakpoint-infix-rear(sm, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1480px))
+//    "sm-"
+@function breakpoint-infix-rear($name, $breakpoints: $grid-breakpoints) {
+  @return if(breakpoint-min($name, $breakpoints) == null, "", "#{$name}-");
+}
+
 // Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
 // Makes the @content apply to the given breakpoint and wider.
-@mixin bp-up($name, $g-breakpoints: $breakpoints) {
+@mixin media-breakpoint-up($name, $g-breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($name, $g-breakpoints);
   @if $min {
     @media (min-width: $min) {
@@ -49,7 +70,7 @@
 
 // Media of at most the maximum breakpoint width. No query for the largest breakpoint.
 // Makes the @content apply to the given breakpoint and narrower.
-@mixin bp-down($name, $breakpoints: $breakpoints) {
+@mixin media-breakpoint-down($name, $breakpoints: $grid-breakpoints) {
   $max: breakpoint-max($name, $breakpoints);
   @if $max {
     @media (max-width: $max) {
@@ -62,7 +83,7 @@
 
 // Media that spans multiple breakpoint widths.
 // Makes the @content apply between the min and max breakpoints
-@mixin bp-between($lower, $upper, $breakpoints: $breakpoints) {
+@mixin media-breakpoint-between($lower, $upper, $breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($lower, $breakpoints);
   $max: breakpoint-max($upper, $breakpoints);
 
@@ -84,7 +105,7 @@
 // Media between the breakpoint's minimum and maximum widths.
 // No minimum for the smallest breakpoint, and no maximum for the largest one.
 // Makes the @content apply only to the given breakpoint, not viewports any wider or narrower.
-@mixin bp-only($name, $breakpoints: $breakpoints) {
+@mixin media-breakpoint-only($name, $breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($name, $breakpoints);
   $max: breakpoint-max($name, $breakpoints);
 
@@ -100,5 +121,30 @@
     @include media-breakpoint-down($name, $breakpoints) {
       @content;
     }
+  }
+}
+
+// Add proxies for mixins with long names
+@mixin bp-up($name, $g-breakpoints: $grid-breakpoints) {
+  @include media-breakpoint-up($name, $g-breakpoints) {
+    @content;
+  }
+}
+
+@mixin bp-down($name, $breakpoints: $grid-breakpoints) {
+  @include media-breakpoint-down($name, $breakpoints) {
+    @content;
+  }
+}
+
+@mixin bp-between($lower, $upper, $breakpoints: $grid-breakpoints) {
+  @include media-breakpoint-between($lower, $upper, $breakpoints) {
+    @content;
+  }
+}
+
+@mixin bp-only($name, $breakpoints: $grid-breakpoints) {
+  @include media-breakpoint-only($name, $breakpoints) {
+    @content;
   }
 }
