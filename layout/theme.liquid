@@ -7,17 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="canonical" href="{{ canonical_url }}" />
 
-    <!-- @TODO - Update add these favicon theme settings -->
-    {% if settings.touch_icon != blank %}
-      <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.touch_icon | img_url: '180x180' }}">
-    {% elsif settings.favicon != blank %}
-      <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.favicon | img_url: '180x180' }}">
-    {% endif %}
-
-    {% if settings.favicon != blank %}
-      <link rel="icon" type="image/png" sizes="32x32" href="{{ settings.favicon | img_url: '32x32' }}">
-      <link rel="icon" type="image/png" sizes="16x16" href="{{ settings.favicon | img_url: '16x16' }}">
-    {% endif %}
+    {% render 'favicon' %}
 
     {% capture seo_title %}
       {{ page_title }}
@@ -31,6 +21,7 @@
         &ndash; {{ shop.name }}
       {% endunless %}
     {% endcapture %}
+    
     <title>{{- seo_title -}}</title>
 
     {% if page_description %}

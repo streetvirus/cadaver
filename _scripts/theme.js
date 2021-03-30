@@ -9,6 +9,7 @@ import {
 } from './core/utils'
 import { pageLinkFocus } from './core/a11y'
 import AppController     from './core/appController'
+import * as Animations   from './core/animations'
 
 // Views
 import ProductView from './views/product'
@@ -27,9 +28,11 @@ const setViewportHeightProperty = () => {
   document.documentElement.style.setProperty('--viewport-height', v);
 };
 
-(() => {
-  const $body = $(document.body);
+const $body = $(document.body);
 
+Animations.initialize();
+
+(() => {
   const sectionManager = new SectionManager()
 
   sectionManager.register('header', Header)

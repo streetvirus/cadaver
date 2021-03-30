@@ -254,6 +254,15 @@ export function userAgentBodyClass() {
     classes += ' ua-samsung';
   }
 
+  if (ua.indexOf('safari') != -1) { 
+    if (ua.indexOf('chrome') > -1) {
+      // Chrome
+    } else {
+      classes += ' ua-safari';
+    }
+  }
+
+
   d.className = classes;
 }
 
@@ -403,7 +412,7 @@ export function isExternal(url) {
 }
 
 export function isTouch() {
-  return ((Modernizr && Modernizr.touchevents) || 'ontouchstart' in window);
+  return ((window.Modernizr && window.Modernizr.touchevents) || 'ontouchstart' in window);
 }
 
 export function random(min = 0, max = 1) {

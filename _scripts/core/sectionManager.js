@@ -4,6 +4,8 @@ import BaseSection from '../sections/base';
 const SECTION_TYPE_ATTR = 'data-section-type';
 const SECTION_ID_ATTR = 'data-section-id';
 
+const $document = $(document);
+
 export default class SectionManager {
   constructor() {
     this.constructors = {};
@@ -57,6 +59,19 @@ export default class SectionManager {
     }
     return instance;
   }
+
+  getSingleInstance(type) {
+    let instance;
+
+    for (let i = 0; i < this.instances.length; i++) {
+      if (this.instances[i].type === type) {
+        instance = this.instances[i];
+        break;
+      }
+    }
+
+    return instance;
+  }  
 
   load(container, constructor) {
     const $container = $(container);

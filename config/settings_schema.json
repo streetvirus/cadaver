@@ -1,133 +1,46 @@
 [
   {
-    "name": "Colors",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Background"
-      },
-      {
-        "type": "color",
-        "id": "background_color",
-        "label": "Background color"
-      },
-      {
-        "type": "header",
-        "content": "Text"
-      },
-      {
-        "type": "color",
-        "id": "text_color",
-        "label": "Text color"
-      },
-      {
-        "type": "color",
-        "id": "link_color",
-        "label": "Link color"
-      }
-    ]
+    "name": "theme_info",
+    "theme_name": "Cadaver",
+    "theme_version": "1.0.0",
+    "theme_author": "Stefan Bowerman",
   },
   {
-    "name": "Collection pages",
-    "settings": [
-      {
-        "type": "header",
-        "content": "Product Grid"
-      },
-      {
-        "type": "select",
-        "id": "products_per_row",
-        "label": "Number of products per row",
-        "options": [
-          {
-            "value": "2",
-            "label": "2"
-          },
-          {
-            "value": "3",
-            "label": "3"
-          },
-          {
-            "value": "4",
-            "label": "4"
-          },
-          {
-            "value": "5",
-            "label": "5"
-          },
-          {
-            "value": "6",
-            "label": "6"
-          }
-        ],
-        "default": "4"
-      },
-      {
-        "type": "select",
-        "id": "number_of_rows",
-        "label": "Number of rows",
-        "options": [
-          {
-            "value": "1",
-            "label": "1"
-          },
-          {
-            "value": "2",
-            "label": "2"
-          },
-          {
-            "value": "3",
-            "label": "3"
-          },
-          {
-            "value": "4",
-            "label": "4"
-          },
-          {
-            "value": "5",
-            "label": "5"
-          },
-          {
-            "value": "6",
-            "label": "6"
-          },
-          {
-            "value": "7",
-            "label": "7"
-          },
-          {
-            "value": "8",
-            "label": "8"
-          }
-        ],
-        "default": "3"
-      }
-    ]
-  },
-  {
-    "name": "Social media",
-    "settings": [
+    "name": "Social",
+    "settings": [  
       {
         "type": "header",
         "content": "Accounts"
       },
       {
         "type": "text",
-        "id": "social_twitter_link",
-        "label": "Twitter",
-        "info": "https:\/\/twitter.com\/shopify"
+        "id": "social_twitter_handle",
+        "label": "Twitter Handle"
+      }
+    ]
+  },
+  {
+    "name": "Sharing",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Sharing Images"
       },
       {
-        "type": "text",
-        "id": "social_instagram_link",
-        "label": "Instagram",
-        "info": "https:\/\/instagram.com\/shopify"
-      },
+        "type": "image_picker",
+        "id": "sharing_image",
+        "label": "Image"
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
       {
-        "type": "text",
-        "id": "social_facebook_link",
-        "label": "Facebook",
-        "info": "https:\/\/www.facebook.com\/shopify"
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon Image",
+        "info": "Should be at least 32px x 32px"
       }
     ]
   }
